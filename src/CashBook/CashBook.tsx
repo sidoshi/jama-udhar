@@ -29,6 +29,7 @@ import {
 } from "@mui/icons-material";
 import { DeleteEntryDialog } from "./DeleteEntryDialog";
 import type { Entry } from "../store/slices/cashBookSlice";
+import { evaluate, isValid } from "../math";
 
 function parseNumber(value: string): number | null {
   const numberValue = Number(value.toString().replace(/[₹, ]/g, ""));
@@ -57,7 +58,11 @@ function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
   };
 
   const onSubmitOrBlur = useCallback(() => {
-    const numericValue = parseNumber(editValue);
+    if (!isValid(editValue)) {
+      return;
+    }
+
+    const numericValue = evaluate(editValue);
     if (numericValue != null) {
       updateEntry({
         ...entry,
@@ -70,11 +75,15 @@ function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
     }, 0);
   }, [editValue, entry, updateEntry, setEditBoxId]);
 
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditValue(e.target.value);
+  };
+
   return isEntryEditActive ? (
     <TextField
       size="small"
       value={editValue}
-      onChange={(e) => setEditValue(e.target.value)}
+      onChange={onChange}
       onBlur={onSubmitOrBlur}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
