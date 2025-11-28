@@ -3,7 +3,7 @@ export const toLocaleRupeeString = (amount: number) => {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   });
-  return `₹${absAmount}`;
+  return `${amount < 0 ? "-" : ""} ₹${absAmount}`;
 };
 
 export const DATE_FORMAT = "YYYY-MM-DD";

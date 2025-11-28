@@ -32,6 +32,9 @@ export type CashBookSlice = {
   deleteEntry: (entryId: string) => void;
   addEntry: (entry: Entry) => void;
   updateEntry: (entry: Entry) => void;
+
+  editBoxId?: string;
+  setEditBoxId: (entryId: string | undefined) => void;
 };
 
 export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
@@ -100,6 +103,15 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
           entryToUpdate.account = entry.account;
           entryToUpdate.type = entry.type;
         }
+      }
+    }),
+
+  setEditBoxId: (entryId: string | undefined) =>
+    set((state) => {
+      if (entryId == null) {
+        state.editBoxId = undefined;
+      } else {
+        state.editBoxId = `${state.activeDate}-${entryId}`;
       }
     }),
 });

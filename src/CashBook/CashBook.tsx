@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import {
   Paper,
   Typography,
@@ -25,6 +25,69 @@ import { Cancel, DragHandle } from "@mui/icons-material";
 import { DeleteEntryDialog } from "./DeleteEntryDialog";
 import type { Entry } from "../store/slices/cashBookSlice";
 
+function parseNumber(value: string): number | null {
+  const numberValue = Number(value.toString().replace(/[₹,]/g, ""));
+  if (isNaN(numberValue)) {
+    return null;
+  }
+  return numberValue;
+}
+
+type EntryAmountEditBoxProps = {
+  entry: Entry;
+};
+
+function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
+  const setEditBoxId = useAppStore((state) => state.setEditBoxId);
+  const updateEntry = useAppStore((state) => state.updateEntry);
+  const editBoxId = useAppStore((state) => state.editBoxId);
+  const activeDate = useAppStore((state) => state.activeDate);
+
+  const [editValue, setEditValue] = useState(entry.amount.toString());
+  const isEntryEditActive = editBoxId === `${activeDate}-${entry.id}`;
+
+  const onClickEdit = () => {
+    setEditBoxId(entry.id);
+    setEditValue(entry.amount.toString());
+  };
+
+  const onSubmitOrBlur = useCallback(() => {
+    const numericValue = parseNumber(editValue);
+    if (numericValue != null) {
+      updateEntry({
+        ...entry,
+        amount: numericValue,
+      });
+    }
+    // Use setTimeout to ensure the blur event completes before unmounting
+    setTimeout(() => {
+      setEditBoxId(undefined);
+    }, 0);
+  }, [editValue, entry, updateEntry, setEditBoxId]);
+
+  return isEntryEditActive ? (
+    <TextField
+      size="small"
+      value={editValue}
+      onChange={(e) => setEditValue(e.target.value)}
+      onBlur={onSubmitOrBlur}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          onSubmitOrBlur();
+        }
+        if (e.key === "Escape") {
+          setEditBoxId(undefined);
+        }
+      }}
+      autoFocus
+    />
+  ) : (
+    <Button fullWidth size="large" onClick={onClickEdit} variant="outlined">
+      {toLocaleRupeeString(entry.amount)}
+    </Button>
+  );
+}
+
 type DNDRowProps = {
   entry: Entry;
 };
@@ -37,10 +100,6 @@ function DNDRow({ entry }: DNDRowProps) {
     data: { account, amount, type },
   });
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({ id });
-
-  const onClickEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-  };
 
   const onClickDelete = () => {
     setDeleteDialogOpen(true);
@@ -82,14 +141,7 @@ function DNDRow({ entry }: DNDRowProps) {
               justifyContent="flex-end"
               gap={1}
             >
-              <Button
-                fullWidth
-                size="large"
-                onClick={onClickEdit}
-                variant="outlined"
-              >
-                {toLocaleRupeeString(amount)}
-              </Button>
+              <EntryAmountEditBox entry={entry} />
               <IconButton onClick={onClickDelete} color="error" size="small">
                 <Cancel fontSize="small" />
               </IconButton>
@@ -124,11 +176,9 @@ function AddEntryForm({ type }: AddEntryFormProps) {
 
   const onAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const numberValue = Number(value.toString().replace(/[₹,]/g, ""));
-    if (isNaN(numberValue) || numberValue < 0) {
-      return;
-    }
-    setAmount(numberValue);
+
+    const numberValue = parseNumber(value);
+    setAmount(numberValue || "");
   };
 
   const onSubmit = (e: React.FormEvent) => {
