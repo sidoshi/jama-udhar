@@ -9,6 +9,7 @@ import {
   Button,
   TextField,
   ButtonGroup,
+  Checkbox,
 } from "@mui/material";
 import { zip } from "lodash-es";
 import generatePDF from "react-to-pdf";
@@ -24,16 +25,11 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { useAppStore, useEntriesForActiveDate, useUndoRedo } from "../store";
 import { toLocaleRupeeString } from "../utils";
 import dayjs from "dayjs";
-import {
-  Cancel,
-  CheckCircle,
-  DragHandle,
-  WarningRounded,
-  Undo,
-  Redo,
-} from "@mui/icons-material";
+import { Cancel, DragHandle, Undo, Redo } from "@mui/icons-material";
 import { DeleteEntryDialog } from "./DeleteEntryDialog";
 import {
+  creditAddAccountAtom,
+  debitAddAccountAtom,
   editBoxIdAtom,
   printPdfAtom,
   setEditBoxIdAtom,
@@ -173,7 +169,7 @@ function DNDRow({ entry }: DNDRowProps) {
           px={1}
           size={12}
         >
-          <Grid size={1} py={1} alignContent="center" direction="row">
+          <Grid size={1} py={1} alignContent="center">
             <IconButton size="small" {...listeners} {...attributes}>
               <DragHandle sx={{ cursor: "grab" }} fontSize="small" />
             </IconButton>
@@ -194,6 +190,7 @@ function DNDRow({ entry }: DNDRowProps) {
               <IconButton onClick={onClickDelete} color="error" size="small">
                 <Cancel fontSize="small" />
               </IconButton>
+              <Checkbox />
             </Box>
           </Grid>
         </Grid>
@@ -214,9 +211,19 @@ type AddEntryFormProps = {
 
 function AddEntryForm({ type }: AddEntryFormProps) {
   const addEntry = useAppStore((state) => state.addEntry);
-  const [account, setAccount] = useState("");
+  const [account, setAccount] = useAtom(
+    type === "debit" ? debitAddAccountAtom : creditAddAccountAtom
+  );
   const [amount, setAmount] = useState<number | "" | "-">("");
   const accountRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        accountRef.current?.focus();
+      }, 300);
+    });
+  }, [account]);
 
   const onAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value || "";
@@ -346,7 +353,7 @@ function Table({ title, entries, type }: TableProps) {
         </Grid>
 
         <Box sx={{ mt: 2, textAlign: "right" }}>
-          <Typography variant="subtitle1" fontWeight="bold">
+          <Typography variant="h4" fontWeight="bold">
             Total:{" "}
             {toLocaleRupeeString(entries.reduce((sum, e) => sum + e.amount, 0))}
           </Typography>
@@ -491,7 +498,7 @@ export function CashBook() {
           </Box>
         </Box>
 
-        <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
+        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
           <Table
             type="credit"
             id="credit"
@@ -505,28 +512,6 @@ export function CashBook() {
             entries={entries.debit}
           />
         </Box>
-
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="h6">
-            Balance: {toLocaleRupeeString(debitTotal - creditTotal)}
-          </Typography>
-          {debitTotal !== creditTotal && (
-            <Box display="flex" alignItems="center" gap={0.5} mt={1}>
-              <WarningRounded color="warning" />
-              <Typography variant="body2" color="warning.main">
-                Warning: Debit and Credit totals do not match!
-              </Typography>
-            </Box>
-          )}
-          {debitTotal === creditTotal && (
-            <Box display="flex" alignItems="center" gap={0.5} mt={1}>
-              <CheckCircle color="success" />
-              <Typography variant="body2" color="success.main">
-                Debit and Credit totals are balanced.
-              </Typography>
-            </Box>
-          )}
-        </Paper>
       </Box>
 
       <DragOverlay>

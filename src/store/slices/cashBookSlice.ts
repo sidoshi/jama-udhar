@@ -21,6 +21,9 @@ export const setEditBoxIdAtom = atom(
   }
 );
 
+export const debitAddAccountAtom = atom<string>("");
+export const creditAddAccountAtom = atom<string>("");
+
 const EntryType = {
   debit: "debit",
   credit: "credit",

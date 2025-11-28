@@ -2,6 +2,7 @@ import "react-cmdk/dist/cmdk.css";
 import CommandPalette, { filterItems, getItemIndex } from "react-cmdk";
 import { useEffect, useState } from "react";
 import {
+  AddBox,
   EditNote,
   PrintOutlined,
   UploadFileRounded,
@@ -9,7 +10,12 @@ import {
 import { useEntriesForActiveDate } from "./store";
 import { toLocaleRupeeString } from "./utils";
 import { useSetAtom } from "jotai";
-import { printPdfAtom, setEditBoxIdAtom } from "./store/slices/cashBookSlice";
+import {
+  creditAddAccountAtom,
+  debitAddAccountAtom,
+  printPdfAtom,
+  setEditBoxIdAtom,
+} from "./store/slices/cashBookSlice";
 import { handlePDFRestore } from "./pdfRestore";
 
 export const Example = () => {
@@ -19,6 +25,9 @@ export const Example = () => {
   const entries = useEntriesForActiveDate();
   const setPrintPdfAtom = useSetAtom(printPdfAtom);
   const setEditBoxId = useSetAtom(setEditBoxIdAtom);
+
+  const setDebitAddAccount = useSetAtom(debitAddAccountAtom);
+  const setCreditAddAccount = useSetAtom(creditAddAccountAtom);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -62,18 +71,9 @@ export const Example = () => {
         ],
       },
       {
-        heading: "Edit",
-        id: "advanced",
+        heading: "Debit",
+        id: "debit",
         items: [
-          ...entries.credit.map((e) => ({
-            id: `credit-${e.id}-edit`,
-            children: `${e.account} - ${toLocaleRupeeString(e.amount)}`,
-            icon: EditNote,
-            onClick: () => {
-              setEditBoxId(e.id);
-            },
-          })),
-
           ...entries.debit.map((e) => ({
             id: `debit-${e.id}-edit`,
             children: `${e.account} - ${toLocaleRupeeString(e.amount)}`,
@@ -84,7 +84,45 @@ export const Example = () => {
           })),
         ],
       },
+
+      {
+        heading: "Credit",
+        id: "credit",
+        items: [
+          ...entries.credit.map((e) => ({
+            id: `credit-${e.id}-edit`,
+            children: `${e.account} - ${toLocaleRupeeString(e.amount)}`,
+            icon: EditNote,
+            onClick: () => {
+              setEditBoxId(e.id);
+            },
+          })),
+        ],
+      },
+      {
+        heading: "Add",
+        id: "add",
+        items: [
+          {
+            id: "add-debit",
+            children: `Add: ${search.toUpperCase()} to Debit`,
+            icon: AddBox,
+            onClick: () => {
+              setDebitAddAccount(search.toUpperCase());
+            },
+          },
+          {
+            id: "add-credit",
+            children: `Add: ${search.toUpperCase()} to Credit`,
+            icon: AddBox,
+            onClick: () => {
+              setCreditAddAccount(search.toUpperCase());
+            },
+          },
+        ],
+      },
     ],
+
     search
   );
 
