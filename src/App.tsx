@@ -4,6 +4,7 @@ import { Box, Typography } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { CashBookRoot } from "./CashBook/CashBookRoot";
+import Example from "./CmdK";
 
 const darkTheme = createTheme({
   palette: {
@@ -19,6 +20,7 @@ function Layout() {
       </Box>
 
       <CashBookRoot />
+      <Example />
     </Box>
   );
 }

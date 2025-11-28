@@ -19,7 +19,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
   targetRef,
 }) => {
   // Split entries into chunks that fit on a page (approximately 25-30 entries per page)
-  const entries_PER_PAGE = 20;
+  const entries_PER_PAGE = 15;
   const pageChunks: Array<typeof entries> = [];
 
   for (let i = 0; i < entries.length; i += entries_PER_PAGE) {

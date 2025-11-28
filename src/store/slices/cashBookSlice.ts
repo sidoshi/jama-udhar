@@ -5,8 +5,9 @@ import { getCopiedFromMostRecentCashBook } from "../selectors";
 import { atom } from "jotai";
 import { useAppStore } from "..";
 
-export const editBoxIdAtom = atom<string | undefined>(undefined);
+export const printPdfAtom = atom<boolean>(false);
 
+export const editBoxIdAtom = atom<string | undefined>(undefined);
 export const setEditBoxIdAtom = atom(
   null,
   (_get, set, update: string | undefined) => {

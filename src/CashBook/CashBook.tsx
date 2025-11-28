@@ -35,6 +35,7 @@ import {
 import { DeleteEntryDialog } from "./DeleteEntryDialog";
 import {
   editBoxIdAtom,
+  printPdfAtom,
   setEditBoxIdAtom,
   type CashBook,
   type Entry,
@@ -44,8 +45,9 @@ import {
   EntryTransferDialog,
   type EntryTransferDialogProps,
 } from "./EntryTransferDialog";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { PDFLedger } from "./PDFLedger";
+import { handlePDFRestore } from "../pdfRestore";
 
 function parseNumber(value: string): number | null {
   const numberValue = Number(value.toString().replace(/[₹, ]/g, ""));
@@ -64,6 +66,7 @@ function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
   const editBoxId = useAtomValue(editBoxIdAtom);
   const setEditBoxId = useSetAtom(setEditBoxIdAtom);
   const activeDate = useAppStore((state) => state.activeDate);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [editValue, setEditValue] = useState(entry.amount.toString());
   const isEntryEditActive = editBoxId === `${activeDate}-${entry.id}`;
@@ -95,10 +98,22 @@ function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
     setEditValue(e.target.value);
   };
 
+  useEffect(() => {
+    if (isEntryEditActive) {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 300);
+      });
+    }
+  }, [isEntryEditActive]);
+
   return isEntryEditActive ? (
     <TextField
       size="small"
       value={editValue}
+      fullWidth
+      inputRef={inputRef}
       onChange={onChange}
       onBlur={onSubmitOrBlur}
       onKeyDown={(e) => {
@@ -109,7 +124,6 @@ function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
           setEditBoxId(undefined);
         }
       }}
-      autoFocus
     />
   ) : (
     <Button fullWidth size="large" onClick={onClickEdit} variant="outlined">
@@ -249,7 +263,7 @@ function AddEntryForm({ type }: AddEntryFormProps) {
 
   return (
     <form onSubmit={onSubmit}>
-      <Grid container size={12} gap={1} alignItems="center" mb={2}>
+      <Grid spacing={2} container size={12} alignItems="center" mb={2}>
         <Grid size={5}>
           <TextField
             fullWidth
@@ -273,7 +287,7 @@ function AddEntryForm({ type }: AddEntryFormProps) {
             onChange={onAmountChange}
           />
         </Grid>
-        <Grid size={1}>
+        <Grid size={2}>
           <Button type="submit" fullWidth size="small" variant="contained">
             Add
           </Button>
@@ -351,7 +365,7 @@ export function CashBook() {
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
-  const [isPrinting, setIsPrinting] = useState(false);
+  const [isPrinting, setIsPrinting] = useAtom(printPdfAtom);
   const printTargetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -377,40 +391,7 @@ export function CashBook() {
     if (isPrinting) {
       printPDF();
     }
-  }, [isPrinting, printTargetRef, activeDate, entries]);
-
-  function handlePDFRestore() {
-    // Create a hidden file input to select PDF
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/pdf";
-    input.onchange = async (e: Event) => {
-      const target = e.target as HTMLInputElement;
-      if (target.files && target.files.length > 0) {
-        const file = target.files[0];
-        const arrayBuffer = await file.arrayBuffer();
-        const pdfData = new Uint8Array(arrayBuffer);
-
-        // Use pdf-lib to read metadata
-        const { PDFDocument } = await import("pdf-lib");
-        const pdfDoc = await PDFDocument.load(pdfData);
-        const metadata = pdfDoc.getTitle();
-
-        if (metadata) {
-          try {
-            const cashBook: CashBook = JSON.parse(metadata);
-            useAppStore.getState().loadToCleanStateFromPDF(cashBook);
-          } catch (e) {
-            console.error(e);
-            alert("Failed to parse accounting data from PDF metadata.");
-          }
-        } else {
-          alert("No accounting data found in PDF metadata.");
-        }
-      }
-    };
-    input.click();
-  }
+  }, [isPrinting, printTargetRef, activeDate, entries, setIsPrinting]);
 
   function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id);
@@ -512,16 +493,16 @@ export function CashBook() {
 
         <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
           <Table
-            type="debit"
-            id="debit"
-            title="Debit"
-            entries={entries.debit}
-          />
-          <Table
             type="credit"
             id="credit"
             title="Credit"
             entries={entries.credit}
+          />
+          <Table
+            type="debit"
+            id="debit"
+            title="Debit"
+            entries={entries.debit}
           />
         </Box>
 
