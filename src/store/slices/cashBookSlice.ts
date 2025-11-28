@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import type { SliceStateCreator } from "../slice";
 import { DATE_FORMAT } from "../../utils";
+import { getMostRecentCashBook } from "../selectors";
 
 const EntryType = {
   debit: "debit",
@@ -27,6 +28,7 @@ export type CashBookSlice = {
   cashBookByDate: Record<string, CashBook>;
 
   setActiveDate: (date: dayjs.Dayjs) => void;
+  deleteEntry: (entryId: string) => void;
 };
 
 export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
@@ -168,5 +170,22 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
   setActiveDate: (date: dayjs.Dayjs) =>
     set((state) => {
       state.activeDate = date.format(DATE_FORMAT);
+    }),
+
+  deleteEntry: (entryId: string) =>
+    set((state) => {
+      if (state.cashBookByDate[state.activeDate] == null) {
+        const copiedCashBook = getMostRecentCashBook(state.activeDate);
+        if (copiedCashBook) {
+          state.cashBookByDate[state.activeDate] = {
+            ...copiedCashBook,
+            date: state.activeDate,
+          };
+        }
+      }
+      const cashBook = state.cashBookByDate[state.activeDate];
+      if (cashBook) {
+        cashBook.entries = cashBook.entries.filter((e) => e.id !== entryId);
+      }
     }),
 });

@@ -21,15 +21,16 @@ import { useAppStore, useEntriesForActiveDate } from "../store";
 import { toLocaleRupeeString } from "../utils";
 import dayjs from "dayjs";
 import { Cancel, DragHandle } from "@mui/icons-material";
+import { DeleteEntryDialog } from "./DeleteEntryDialog";
+import type { Entry } from "../store/slices/cashBookSlice";
 
 type DNDRowProps = {
-  id: string;
-  account: string;
-  amount: number;
-  type: string;
+  entry: Entry;
 };
 
-function DNDRow({ id, account, amount, type }: DNDRowProps) {
+function DNDRow({ entry }: DNDRowProps) {
+  const { id, account, amount, type } = entry;
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id,
     data: { account, amount, type },
@@ -40,67 +41,75 @@ function DNDRow({ id, account, amount, type }: DNDRowProps) {
     e.preventDefault();
   };
 
-  const onClickDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const onClickDelete = () => {
+    setDeleteDialogOpen(true);
   };
 
   return (
-    <Grid
-      ref={setDroppableRef}
-      sx={{
-        backgroundColor: isOver ? "action.selected" : "inherit",
-      }}
-      container
-      size={12}
-      key={id}
-    >
+    <>
       <Grid
-        ref={setNodeRef}
+        ref={setDroppableRef}
         sx={{
-          opacity: isDragging ? 0.5 : 1,
-          "&:hover": { backgroundColor: "action.hover" },
+          backgroundColor: isOver ? "action.selected" : "inherit",
         }}
         container
-        px={1}
         size={12}
+        key={id}
       >
-        <Grid size={1} py={1} alignContent="center" direction="row">
-          <IconButton size="small" {...listeners} {...attributes}>
-            <DragHandle sx={{ cursor: "grab" }} fontSize="small" />
-          </IconButton>
-        </Grid>
-        <Grid size={6} py={1} alignContent="center">
-          <Typography variant="body1">{account}</Typography>
-        </Grid>
-        <Grid size={5} py={1} textAlign="right">
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="flex-end"
-            gap={1}
-          >
-            <Button
-              fullWidth
-              size="large"
-              onClick={onClickEdit}
-              variant="outlined"
-            >
-              {toLocaleRupeeString(amount)}
-            </Button>
-            <IconButton onClick={onClickDelete} color="error" size="small">
-              <Cancel fontSize="small" />
+        <Grid
+          ref={setNodeRef}
+          sx={{
+            opacity: isDragging ? 0.5 : 1,
+            "&:hover": { backgroundColor: "action.hover" },
+          }}
+          container
+          px={1}
+          size={12}
+        >
+          <Grid size={1} py={1} alignContent="center" direction="row">
+            <IconButton size="small" {...listeners} {...attributes}>
+              <DragHandle sx={{ cursor: "grab" }} fontSize="small" />
             </IconButton>
-          </Box>
+          </Grid>
+          <Grid size={6} py={1} alignContent="center">
+            <Typography variant="body1">{account}</Typography>
+          </Grid>
+          <Grid size={5} py={1} textAlign="right">
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="flex-end"
+              gap={1}
+            >
+              <Button
+                fullWidth
+                size="large"
+                onClick={onClickEdit}
+                variant="outlined"
+              >
+                {toLocaleRupeeString(amount)}
+              </Button>
+              <IconButton onClick={onClickDelete} color="error" size="small">
+                <Cancel fontSize="small" />
+              </IconButton>
+            </Box>
+          </Grid>
         </Grid>
       </Grid>
-    </Grid>
+
+      <DeleteEntryDialog
+        isOpen={isDeleteDialogOpen}
+        entry={entry}
+        onClose={() => setDeleteDialogOpen(false)}
+      />
+    </>
   );
 }
 
 type TableProps = {
   id: string;
   title: string;
-  entries: { id: string; account: string; amount: number; type: string }[];
+  entries: Entry[];
 };
 function Table({ title, entries }: TableProps) {
   return (
@@ -137,13 +146,7 @@ function Table({ title, entries }: TableProps) {
           )}
 
           {entries.map((entry) => (
-            <DNDRow
-              key={entry.id}
-              id={entry.id}
-              account={entry.account}
-              amount={entry.amount}
-              type={entry.type}
-            />
+            <DNDRow key={entry.id} entry={entry} />
           ))}
         </Grid>
 

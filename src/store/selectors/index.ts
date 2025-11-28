@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { useAppStore } from "..";
 import { DATE_FORMAT } from "../../utils";
 import type { CashBook } from "../slices/cashBookSlice";
+import { useShallow } from "zustand/shallow";
 
 function findMostRecentDateBefore(activeDate: string, dates: string[]) {
   if (dates.length === 0) {
@@ -36,18 +37,24 @@ export const getEntriesForCashBook = (cashBook?: CashBook) => {
   return { debit: debitEntries, credit: creditEntries, date: cashBook?.date };
 };
 
+export const getMostRecentCashBook = (activeDate: string) => {
+  const allDates = Object.keys(useAppStore.getState().cashBookByDate);
+
+  // Find the most recent date before activeDate, if any
+  const recentDate = findMostRecentDateBefore(activeDate, allDates);
+  if (recentDate) {
+    return useAppStore.getState().cashBookByDate[recentDate];
+  }
+};
+
 export const useEntriesForActiveDate = () => {
   const activeDate = useAppStore((state) => state.activeDate);
-  let cashBook = useAppStore.getState().cashBookByDate[activeDate];
+  let cashBook: CashBook | undefined = useAppStore(
+    useShallow((state) => state.cashBookByDate[activeDate])
+  );
 
   if (cashBook == null) {
-    const allDates = Object.keys(useAppStore.getState().cashBookByDate);
-
-    // Find the most recent date before activeDate, if any
-    const recentDate = findMostRecentDateBefore(activeDate, allDates);
-    if (recentDate) {
-      cashBook = useAppStore.getState().cashBookByDate[recentDate];
-    }
+    cashBook = getMostRecentCashBook(activeDate);
   }
 
   return getEntriesForCashBook(cashBook);
