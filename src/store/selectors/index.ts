@@ -47,6 +47,21 @@ export const getMostRecentCashBook = (activeDate: string) => {
   }
 };
 
+export const getCopiedFromMostRecentCashBook = (activeDate: string) => {
+  const mostRecentCashBook = getMostRecentCashBook(activeDate);
+  if (mostRecentCashBook) {
+    return {
+      ...mostRecentCashBook,
+      entries: mostRecentCashBook.entries.map((entry) => ({
+        ...entry,
+        previousAmmount: entry.amount,
+      })),
+      date: activeDate,
+      id: activeDate,
+    };
+  }
+};
+
 export const useEntriesForActiveDate = () => {
   const activeDate = useAppStore((state) => state.activeDate);
   let cashBook: CashBook | undefined = useAppStore(

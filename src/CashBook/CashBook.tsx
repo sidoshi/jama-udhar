@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Paper,
   Typography,
@@ -7,6 +7,7 @@ import {
   Divider,
   IconButton,
   Button,
+  TextField,
 } from "@mui/material";
 import {
   DndContext,
@@ -106,12 +107,98 @@ function DNDRow({ entry }: DNDRowProps) {
   );
 }
 
+type AddEntryFormProps = {
+  type: Entry["type"];
+};
+
+function AddEntryForm({ type }: AddEntryFormProps) {
+  const addEntry = useAppStore((state) => state.addEntry);
+  const [account, setAccount] = useState("");
+  const [amount, setAmount] = useState<number | "">("");
+  const accountRef = useRef<HTMLInputElement>(null);
+
+  const onAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value || "";
+    setAccount(newValue.toUpperCase());
+  };
+
+  const onAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const numberValue = Number(value.toString().replace(/[₹,]/g, ""));
+    if (isNaN(numberValue) || numberValue < 0) {
+      return;
+    }
+    setAmount(numberValue);
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (account.trim().length < 2) {
+      return;
+    }
+    if (amount === "" || amount === 0) {
+      return;
+    }
+
+    addEntry({
+      id: `${type}-${dayjs().unix()}`,
+      type,
+      account: account.trim(),
+      amount: amount,
+      previousAmmount: 0,
+    });
+
+    setAccount("");
+    setAmount("");
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        accountRef.current?.focus();
+      }, 0);
+    });
+  };
+
+  return (
+    <form onSubmit={onSubmit}>
+      <Grid container size={12} gap={1} alignItems="center" mb={2}>
+        <Grid size={5}>
+          <TextField
+            fullWidth
+            inputRef={accountRef}
+            label="Account Name"
+            variant="outlined"
+            size="small"
+            value={account}
+            onChange={onAccountChange}
+          />
+        </Grid>
+        <Grid size={5}>
+          <TextField
+            fullWidth
+            label="Amount (₹)"
+            variant="outlined"
+            size="small"
+            value={amount ? toLocaleRupeeString(amount) : ""}
+            onChange={onAmountChange}
+          />
+        </Grid>
+        <Grid size={1}>
+          <Button type="submit" fullWidth size="small" variant="contained">
+            Add
+          </Button>
+        </Grid>
+      </Grid>
+    </form>
+  );
+}
+
 type TableProps = {
   id: string;
   title: string;
+  type: Entry["type"];
   entries: Entry[];
 };
-function Table({ title, entries }: TableProps) {
+
+function Table({ title, entries, type }: TableProps) {
   return (
     <Box sx={{ flex: 1, minWidth: 300 }}>
       <Paper
@@ -120,6 +207,7 @@ function Table({ title, entries }: TableProps) {
           minHeight: 400,
         }}
       >
+        <AddEntryForm type={type} />
         <Grid container>
           <Grid container size={12} px={1}>
             <Grid size={8}>
@@ -137,6 +225,7 @@ function Table({ title, entries }: TableProps) {
           <Grid size={12}>
             <Divider sx={{ my: 1 }} />
           </Grid>
+
           {entries.length === 0 && (
             <Grid size={12} py={10} textAlign="center">
               <Typography variant="body2" color="textSecondary">
@@ -145,7 +234,7 @@ function Table({ title, entries }: TableProps) {
             </Grid>
           )}
 
-          {entries.map((entry) => (
+          {entries.reverse().map((entry) => (
             <DNDRow key={entry.id} entry={entry} />
           ))}
         </Grid>
@@ -200,8 +289,18 @@ export function CashBook() {
         </Box>
 
         <Box sx={{ display: "flex", gap: 3, mb: 3 }}>
-          <Table id="debit" title="Debit" entries={entries.debit} />
-          <Table id="credit" title="Credit" entries={entries.credit} />
+          <Table
+            type="debit"
+            id="debit"
+            title="Debit"
+            entries={entries.debit}
+          />
+          <Table
+            type="credit"
+            id="credit"
+            title="Credit"
+            entries={entries.credit}
+          />
         </Box>
 
         <Paper sx={{ p: 2 }}>
