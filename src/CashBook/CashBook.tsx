@@ -10,6 +10,7 @@ import {
 } from "@dnd-kit/core";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { useEntriesForActiveDate } from "../store";
+import { toLocaleRupeeString } from "../utils";
 
 type DNDRowProps = {
   id: string;
@@ -51,7 +52,7 @@ function DNDRow({ id, account, amount, type }: DNDRowProps) {
           <Typography variant="body1">{account}</Typography>
         </Grid>
         <Grid size={4} py={1} textAlign="right">
-          <Typography variant="h6">{`$${amount.toFixed(2)}`}</Typography>
+          <Typography variant="h6">{toLocaleRupeeString(amount)}</Typography>
         </Grid>
       </Grid>
     </Grid>
@@ -110,7 +111,8 @@ function Table({ title, entries }: TableProps) {
 
         <Box sx={{ mt: 2, textAlign: "right" }}>
           <Typography variant="subtitle1" fontWeight="bold">
-            Total: ${entries.reduce((sum, e) => sum + e.amount, 0).toFixed(2)}
+            Total:{" "}
+            {toLocaleRupeeString(entries.reduce((sum, e) => sum + e.amount, 0))}
           </Typography>
         </Box>
       </Paper>
@@ -156,7 +158,7 @@ export function CashBook() {
 
         <Paper sx={{ p: 2 }}>
           <Typography variant="h6">
-            Balance: ${(debitTotal - creditTotal).toFixed(2)}
+            Balance: {toLocaleRupeeString(debitTotal - creditTotal)}
           </Typography>
         </Paper>
       </Box>
