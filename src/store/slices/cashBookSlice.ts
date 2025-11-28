@@ -2,6 +2,23 @@ import dayjs from "dayjs";
 import type { SliceStateCreator } from "../slice";
 import { DATE_FORMAT } from "../../utils";
 import { getCopiedFromMostRecentCashBook } from "../selectors";
+import { atom } from "jotai";
+import { useAppStore } from "..";
+
+export const editBoxIdAtom = atom<string | undefined>(undefined);
+
+export const setEditBoxIdAtom = atom(
+  null,
+  (_get, set, update: string | undefined) => {
+    const activeDate = useAppStore.getState().activeDate;
+    if (update == null) {
+      set(editBoxIdAtom, undefined);
+    } else {
+      const editBoxId = `${activeDate}-${update}`;
+      set(editBoxIdAtom, editBoxId);
+    }
+  }
+);
 
 const EntryType = {
   debit: "debit",
@@ -32,9 +49,6 @@ export type CashBookSlice = {
   deleteEntry: (entryId: string) => void;
   addEntry: (entry: Entry) => void;
   updateEntry: (entry: Entry) => void;
-
-  editBoxId?: string;
-  setEditBoxId: (entryId: string | undefined) => void;
 };
 
 export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
@@ -103,15 +117,6 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
           entryToUpdate.account = entry.account;
           entryToUpdate.type = entry.type;
         }
-      }
-    }),
-
-  setEditBoxId: (entryId: string | undefined) =>
-    set((state) => {
-      if (entryId == null) {
-        state.editBoxId = undefined;
-      } else {
-        state.editBoxId = `${state.activeDate}-${entryId}`;
       }
     }),
 });

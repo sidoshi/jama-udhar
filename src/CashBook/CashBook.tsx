@@ -28,12 +28,17 @@ import {
   WarningRounded,
 } from "@mui/icons-material";
 import { DeleteEntryDialog } from "./DeleteEntryDialog";
-import type { Entry } from "../store/slices/cashBookSlice";
+import {
+  editBoxIdAtom,
+  setEditBoxIdAtom,
+  type Entry,
+} from "../store/slices/cashBookSlice";
 import { evaluate, isValid } from "../math";
 import {
   EntryTransferDialog,
   type EntryTransferDialogProps,
 } from "./EntryTransferDialog";
+import { useAtomValue, useSetAtom } from "jotai";
 
 function parseNumber(value: string): number | null {
   const numberValue = Number(value.toString().replace(/[₹, ]/g, ""));
@@ -48,9 +53,9 @@ type EntryAmountEditBoxProps = {
 };
 
 function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
-  const setEditBoxId = useAppStore((state) => state.setEditBoxId);
   const updateEntry = useAppStore((state) => state.updateEntry);
-  const editBoxId = useAppStore((state) => state.editBoxId);
+  const editBoxId = useAtomValue(editBoxIdAtom);
+  const setEditBoxId = useSetAtom(setEditBoxIdAtom);
   const activeDate = useAppStore((state) => state.activeDate);
 
   const [editValue, setEditValue] = useState(entry.amount.toString());
