@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Paper, Typography, Box, Grid, Divider } from "@mui/material";
+import {
+  Paper,
+  Typography,
+  Box,
+  Grid,
+  Divider,
+  IconButton,
+  Button,
+} from "@mui/material";
 import {
   DndContext,
   closestCenter,
@@ -12,6 +20,7 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { useAppStore, useEntriesForActiveDate } from "../store";
 import { toLocaleRupeeString } from "../utils";
 import dayjs from "dayjs";
+import { Cancel, DragHandle } from "@mui/icons-material";
 
 type DNDRowProps = {
   id: string;
@@ -19,12 +28,21 @@ type DNDRowProps = {
   amount: number;
   type: string;
 };
+
 function DNDRow({ id, account, amount, type }: DNDRowProps) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id,
     data: { account, amount, type },
   });
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({ id });
+
+  const onClickEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+  };
+
+  const onClickDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+  };
 
   return (
     <Grid
@@ -38,10 +56,7 @@ function DNDRow({ id, account, amount, type }: DNDRowProps) {
     >
       <Grid
         ref={setNodeRef}
-        {...listeners}
-        {...attributes}
         sx={{
-          cursor: "grab",
           opacity: isDragging ? 0.5 : 1,
           "&:hover": { backgroundColor: "action.hover" },
         }}
@@ -49,11 +64,33 @@ function DNDRow({ id, account, amount, type }: DNDRowProps) {
         px={1}
         size={12}
       >
-        <Grid size={8} py={1}>
+        <Grid size={1} py={1} alignContent="center" direction="row">
+          <IconButton size="small" {...listeners} {...attributes}>
+            <DragHandle sx={{ cursor: "grab" }} fontSize="small" />
+          </IconButton>
+        </Grid>
+        <Grid size={6} py={1} alignContent="center">
           <Typography variant="body1">{account}</Typography>
         </Grid>
-        <Grid size={4} py={1} textAlign="right">
-          <Typography variant="h6">{toLocaleRupeeString(amount)}</Typography>
+        <Grid size={5} py={1} textAlign="right">
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="flex-end"
+            gap={1}
+          >
+            <Button
+              fullWidth
+              size="large"
+              onClick={onClickEdit}
+              variant="outlined"
+            >
+              {toLocaleRupeeString(amount)}
+            </Button>
+            <IconButton onClick={onClickDelete} color="error" size="small">
+              <Cancel fontSize="small" />
+            </IconButton>
+          </Box>
         </Grid>
       </Grid>
     </Grid>
