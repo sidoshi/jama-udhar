@@ -8,6 +8,7 @@ import {
   IconButton,
   Button,
   TextField,
+  ButtonGroup,
 } from "@mui/material";
 import {
   DndContext,
@@ -18,7 +19,7 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { useAppStore, useEntriesForActiveDate } from "../store";
+import { useAppStore, useEntriesForActiveDate, useUndoRedo } from "../store";
 import { toLocaleRupeeString } from "../utils";
 import dayjs from "dayjs";
 import {
@@ -26,6 +27,8 @@ import {
   CheckCircle,
   DragHandle,
   WarningRounded,
+  Undo,
+  Redo,
 } from "@mui/icons-material";
 import { DeleteEntryDialog } from "./DeleteEntryDialog";
 import {
@@ -338,6 +341,7 @@ function Table({ title, entries, type }: TableProps) {
 export function CashBook() {
   const activeDate = useAppStore((state) => state.activeDate);
   const entries = useEntriesForActiveDate();
+  const { canUndo, canRedo, undo, redo } = useUndoRedo();
   const [transfer, setTransfer] =
     useState<EntryTransferDialogProps["transfer"]>();
 
@@ -374,14 +378,44 @@ export function CashBook() {
         onClose={() => setTransfer(undefined)}
       />
       <Box p={2}>
-        <Box mb={4}>
-          <Typography variant="h4">Accounting Sheet</Typography>
-          {entries.date != null && entries.date !== activeDate && (
-            <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-              Showing last recent entries from{" "}
-              {dayjs(entries.date).format("DD MMM YYYY")}
-            </Typography>
-          )}
+        <Box
+          mb={4}
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Box>
+            <Typography variant="h4">Accounting Sheet</Typography>
+            {entries.date != null && entries.date !== activeDate && (
+              <Typography
+                variant="subtitle2"
+                color="textSecondary"
+                gutterBottom
+              >
+                Showing last recent entries from{" "}
+                {dayjs(entries.date).format("DD MMM YYYY")}
+              </Typography>
+            )}
+          </Box>
+          <Box display="flex" gap={1}>
+            <ButtonGroup variant="outlined" aria-label="Basic button group">
+              <Button
+                onClick={() => undo()}
+                disabled={!canUndo}
+                color="primary"
+              >
+                <Undo />
+              </Button>
+
+              <Button
+                onClick={() => redo()}
+                disabled={!canRedo}
+                color="primary"
+              >
+                <Redo />
+              </Button>
+            </ButtonGroup>
+          </Box>
         </Box>
 
         <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
