@@ -6,7 +6,11 @@ export type AppStore = CashBookSlice;
 
 export type SliceStateCreator<T> = StateCreator<
   AppStore,
-  [["zustand/immer", never], ["zustand/devtools", never]],
+  [
+    ["zustand/immer", never],
+    ["zustand/persist", unknown],
+    ["zustand/devtools", never]
+  ],
   [],
   T
 >;

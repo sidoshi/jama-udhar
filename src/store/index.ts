@@ -1,14 +1,23 @@
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { createCashBookSlice } from "./slices/cashBookSlice";
 import type { AppStore } from "./slice";
 
 export const useAppStore = create<AppStore>()(
   devtools(
-    immer((...a) => ({
-      ...createCashBookSlice(...a),
-    })),
+    persist(
+      immer((...a) => ({
+        ...createCashBookSlice(...a),
+      })),
+      {
+        name: "jama-udhar-storage",
+        partialize: (state) => ({
+          activeDate: state.activeDate,
+          cashBookByDate: state.cashBookByDate,
+        }),
+      }
+    ),
     { name: "app-store" }
   )
 );
