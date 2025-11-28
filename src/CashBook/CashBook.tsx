@@ -30,6 +30,10 @@ import {
 import { DeleteEntryDialog } from "./DeleteEntryDialog";
 import type { Entry } from "../store/slices/cashBookSlice";
 import { evaluate, isValid } from "../math";
+import {
+  EntryTransferDialog,
+  type EntryTransferDialogProps,
+} from "./EntryTransferDialog";
 
 function parseNumber(value: string): number | null {
   const numberValue = Number(value.toString().replace(/[₹, ]/g, ""));
@@ -107,13 +111,16 @@ type DNDRowProps = {
 };
 
 function DNDRow({ entry }: DNDRowProps) {
-  const { id, account, amount, type } = entry;
+  const { id, account } = entry;
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id,
-    data: { account, amount, type },
+    data: entry,
   });
-  const { setNodeRef: setDroppableRef, isOver } = useDroppable({ id });
+  const { setNodeRef: setDroppableRef, isOver } = useDroppable({
+    id,
+    data: entry,
+  });
 
   const onClickDelete = () => {
     setDeleteDialogOpen(true);
@@ -326,6 +333,8 @@ function Table({ title, entries, type }: TableProps) {
 export function CashBook() {
   const activeDate = useAppStore((state) => state.activeDate);
   const entries = useEntriesForActiveDate();
+  const [transfer, setTransfer] =
+    useState<EntryTransferDialogProps["transfer"]>();
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
@@ -334,7 +343,12 @@ export function CashBook() {
   }
 
   function handleDragEnd(event: DragEndEvent) {
-    console.log(event);
+    if (event.over != null && event.over.id !== event.active.id) {
+      setTransfer({
+        fromEntry: event.active.data.current as Entry,
+        toEntry: event.over?.data.current as Entry,
+      });
+    }
   }
 
   const activeEntry = activeId
@@ -350,6 +364,10 @@ export function CashBook() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
+      <EntryTransferDialog
+        transfer={transfer}
+        onClose={() => setTransfer(undefined)}
+      />
       <Box p={2}>
         <Box mb={4}>
           <Typography variant="h4">Accounting Sheet</Typography>
