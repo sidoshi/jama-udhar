@@ -19,7 +19,7 @@ export function CashBookRoot() {
           }}
         />
       </Grid>
-      <Grid size={9} p={2}>
+      <Grid size={9}>
         <CashBook />
       </Grid>
     </Grid>

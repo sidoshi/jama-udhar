@@ -21,12 +21,17 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { useAppStore, useEntriesForActiveDate } from "../store";
 import { toLocaleRupeeString } from "../utils";
 import dayjs from "dayjs";
-import { Cancel, DragHandle } from "@mui/icons-material";
+import {
+  Cancel,
+  CheckCircle,
+  DragHandle,
+  WarningRounded,
+} from "@mui/icons-material";
 import { DeleteEntryDialog } from "./DeleteEntryDialog";
 import type { Entry } from "../store/slices/cashBookSlice";
 
 function parseNumber(value: string): number | null {
-  const numberValue = Number(value.toString().replace(/[₹,]/g, ""));
+  const numberValue = Number(value.toString().replace(/[₹, ]/g, ""));
   if (isNaN(numberValue)) {
     return null;
   }
@@ -131,16 +136,18 @@ function DNDRow({ entry }: DNDRowProps) {
               <DragHandle sx={{ cursor: "grab" }} fontSize="small" />
             </IconButton>
           </Grid>
-          <Grid size={6} py={1} alignContent="center">
+          <Grid size={5} py={1} alignContent="center">
             <Typography variant="body1">{account}</Typography>
+            {entry.previousAmmount != null &&
+              entry.previousAmmount !== entry.amount &&
+              entry.previousAmmount !== 0 && (
+                <Typography color="textDisabled" variant="subtitle2">
+                  Previous Balance: {toLocaleRupeeString(entry.previousAmmount)}
+                </Typography>
+              )}
           </Grid>
-          <Grid size={5} py={1} textAlign="right">
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="flex-end"
-              gap={1}
-            >
+          <Grid size={6} py={1} textAlign="right">
+            <Box display="flex" alignItems="center" justifyContent="flex-end">
               <EntryAmountEditBox entry={entry} />
               <IconButton onClick={onClickDelete} color="error" size="small">
                 <Cancel fontSize="small" />
@@ -166,7 +173,7 @@ type AddEntryFormProps = {
 function AddEntryForm({ type }: AddEntryFormProps) {
   const addEntry = useAppStore((state) => state.addEntry);
   const [account, setAccount] = useState("");
-  const [amount, setAmount] = useState<number | "">("");
+  const [amount, setAmount] = useState<number | "" | "-">("");
   const accountRef = useRef<HTMLInputElement>(null);
 
   const onAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,6 +184,11 @@ function AddEntryForm({ type }: AddEntryFormProps) {
   const onAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
+    if (value.trim() === "-") {
+      setAmount("-");
+      return;
+    }
+
     const numberValue = parseNumber(value);
     setAmount(numberValue || "");
   };
@@ -186,7 +198,7 @@ function AddEntryForm({ type }: AddEntryFormProps) {
     if (account.trim().length < 2) {
       return;
     }
-    if (amount === "" || amount === 0) {
+    if (amount === "" || amount === 0 || amount === "-") {
       return;
     }
 
@@ -227,7 +239,9 @@ function AddEntryForm({ type }: AddEntryFormProps) {
             label="Amount (₹)"
             variant="outlined"
             size="small"
-            value={amount ? toLocaleRupeeString(amount) : ""}
+            value={
+              typeof amount === "number" ? toLocaleRupeeString(amount) : amount
+            }
             onChange={onAmountChange}
           />
         </Grid>
@@ -327,7 +341,7 @@ export function CashBook() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <Box sx={{ p: 3 }}>
+      <Box p={2}>
         <Box mb={4}>
           <Typography variant="h4">Accounting Sheet</Typography>
           {entries.date != null && entries.date !== activeDate && (
@@ -338,7 +352,7 @@ export function CashBook() {
           )}
         </Box>
 
-        <Box sx={{ display: "flex", gap: 3, mb: 3 }}>
+        <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
           <Table
             type="debit"
             id="debit"
@@ -357,6 +371,22 @@ export function CashBook() {
           <Typography variant="h6">
             Balance: {toLocaleRupeeString(debitTotal - creditTotal)}
           </Typography>
+          {debitTotal !== creditTotal && (
+            <Box display="flex" alignItems="center" gap={0.5} mt={1}>
+              <WarningRounded color="warning" />
+              <Typography variant="body2" color="warning.main">
+                Warning: Debit and Credit totals do not match!
+              </Typography>
+            </Box>
+          )}
+          {debitTotal === creditTotal && (
+            <Box display="flex" alignItems="center" gap={0.5} mt={1}>
+              <CheckCircle color="success" />
+              <Typography variant="body2" color="success.main">
+                Debit and Credit totals are balanced.
+              </Typography>
+            </Box>
+          )}
         </Paper>
       </Box>
 
