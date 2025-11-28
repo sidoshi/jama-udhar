@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import {
   Paper,
   Typography,
@@ -10,6 +10,8 @@ import {
   TextField,
   ButtonGroup,
 } from "@mui/material";
+import { zip } from "lodash-es";
+import generatePDF from "react-to-pdf";
 import {
   DndContext,
   closestCenter,
@@ -34,6 +36,7 @@ import { DeleteEntryDialog } from "./DeleteEntryDialog";
 import {
   editBoxIdAtom,
   setEditBoxIdAtom,
+  type CashBook,
   type Entry,
 } from "../store/slices/cashBookSlice";
 import { evaluate, isValid } from "../math";
@@ -42,6 +45,7 @@ import {
   type EntryTransferDialogProps,
 } from "./EntryTransferDialog";
 import { useAtomValue, useSetAtom } from "jotai";
+import { PDFLedger } from "./PDFLedger";
 
 function parseNumber(value: string): number | null {
   const numberValue = Number(value.toString().replace(/[₹, ]/g, ""));
@@ -347,6 +351,67 @@ export function CashBook() {
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
+  const [isPrinting, setIsPrinting] = useState(false);
+  const printTargetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function printPDF() {
+      if (printTargetRef.current) {
+        const pdf = await generatePDF(printTargetRef, {
+          method: "build",
+        });
+        const hidden: CashBook = {
+          id: activeDate,
+          date: activeDate,
+          entries: [...entries.debit, ...entries.credit],
+        };
+        pdf.setProperties({
+          title: JSON.stringify(hidden),
+        });
+        pdf.save(`Accounting_Sheet_${activeDate}.pdf`);
+      }
+
+      setIsPrinting(false);
+    }
+
+    if (isPrinting) {
+      printPDF();
+    }
+  }, [isPrinting, printTargetRef, activeDate, entries]);
+
+  function handlePDFRestore() {
+    // Create a hidden file input to select PDF
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/pdf";
+    input.onchange = async (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      if (target.files && target.files.length > 0) {
+        const file = target.files[0];
+        const arrayBuffer = await file.arrayBuffer();
+        const pdfData = new Uint8Array(arrayBuffer);
+
+        // Use pdf-lib to read metadata
+        const { PDFDocument } = await import("pdf-lib");
+        const pdfDoc = await PDFDocument.load(pdfData);
+        const metadata = pdfDoc.getTitle();
+
+        if (metadata) {
+          try {
+            const cashBook: CashBook = JSON.parse(metadata);
+            useAppStore.getState().loadToCleanStateFromPDF(cashBook);
+          } catch (e) {
+            console.error(e);
+            alert("Failed to parse accounting data from PDF metadata.");
+          }
+        } else {
+          alert("No accounting data found in PDF metadata.");
+        }
+      }
+    };
+    input.click();
+  }
+
   function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id);
   }
@@ -366,6 +431,7 @@ export function CashBook() {
 
   const debitTotal = entries.debit.reduce((sum, e) => sum + e.amount, 0);
   const creditTotal = entries.credit.reduce((sum, e) => sum + e.amount, 0);
+  const entryPairs = zip(entries.debit, entries.credit);
 
   return (
     <DndContext
@@ -373,6 +439,15 @@ export function CashBook() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
+      {isPrinting && (
+        <PDFLedger
+          balance={debitTotal - creditTotal}
+          entries={entryPairs}
+          debitTotal={debitTotal}
+          creditTotal={creditTotal}
+          targetRef={printTargetRef}
+        />
+      )}
       <EntryTransferDialog
         transfer={transfer}
         onClose={() => setTransfer(undefined)}
@@ -398,6 +473,23 @@ export function CashBook() {
             )}
           </Box>
           <Box display="flex" gap={1}>
+            <ButtonGroup variant="outlined" aria-label="Basic button group">
+              <Button
+                variant="outlined"
+                onClick={handlePDFRestore}
+                color="primary"
+              >
+                Restore from PDF
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => setIsPrinting(true)}
+                color="primary"
+              >
+                Print / Export PDF
+              </Button>
+            </ButtonGroup>
+
             <ButtonGroup variant="outlined" aria-label="Basic button group">
               <Button
                 onClick={() => undo()}
