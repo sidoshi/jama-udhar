@@ -9,6 +9,7 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
+import { useEntriesForActiveDate } from "../store";
 
 type DNDRowProps = {
   id: string;
@@ -118,17 +119,7 @@ function Table({ title, entries }: TableProps) {
 }
 
 export function CashBook() {
-  const [entries] = useState({
-    debit: [
-      { id: "d1", account: "Cash", amount: 5000, type: "debit" },
-      { id: "d2", account: "Accounts Receivable", amount: 3000, type: "debit" },
-      { id: "d3", account: "Equipment", amount: 10000, type: "debit" },
-    ],
-    credit: [
-      { id: "c1", account: "Accounts Payable", amount: 2000, type: "credit" },
-      { id: "c2", account: "Capital", amount: 16000, type: "credit" },
-    ],
-  });
+  const entries = useEntriesForActiveDate();
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 

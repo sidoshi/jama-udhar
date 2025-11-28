@@ -1,18 +1,19 @@
 import { Grid } from "@mui/material";
 import { StaticDatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useState } from "react";
 import { CashBook } from "./CashBook";
+import { useAppStore } from "../store";
 
 export function CashBookRoot() {
-  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const activeDate = useAppStore((state) => state.activeDate);
+  const setActiveDate = useAppStore((state) => state.setActiveDate);
 
   return (
     <Grid container spacing={2}>
       <Grid size={3}>
         <StaticDatePicker
-          value={selectedDate}
-          onChange={(v) => setSelectedDate(dayjs(v))}
+          value={dayjs(activeDate)}
+          onChange={(v) => setActiveDate(dayjs(v))}
           slots={{
             actionBar: () => null,
           }}
