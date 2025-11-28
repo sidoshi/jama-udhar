@@ -5,3 +5,5 @@ export const toLocaleRupeeString = (amount: number) => {
   });
   return `₹${absAmount}`;
 };
+
+export const DATE_FORMAT = "YYYY-MM-DD";

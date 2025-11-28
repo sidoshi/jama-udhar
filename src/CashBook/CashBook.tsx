@@ -9,8 +9,9 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { useEntriesForActiveDate } from "../store";
+import { useAppStore, useEntriesForActiveDate } from "../store";
 import { toLocaleRupeeString } from "../utils";
+import dayjs from "dayjs";
 
 type DNDRowProps = {
   id: string;
@@ -121,6 +122,7 @@ function Table({ title, entries }: TableProps) {
 }
 
 export function CashBook() {
+  const activeDate = useAppStore((state) => state.activeDate);
   const entries = useEntriesForActiveDate();
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
@@ -147,9 +149,15 @@ export function CashBook() {
       onDragEnd={handleDragEnd}
     >
       <Box sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Accounting Sheet
-        </Typography>
+        <Box mb={4}>
+          <Typography variant="h4">Accounting Sheet</Typography>
+          {entries.date != null && entries.date !== activeDate && (
+            <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+              Showing last recent entries from{" "}
+              {dayjs(entries.date).format("DD MMM YYYY")}
+            </Typography>
+          )}
+        </Box>
 
         <Box sx={{ display: "flex", gap: 3, mb: 3 }}>
           <Table id="debit" title="Debit" entries={entries.debit} />

@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import type { SliceStateCreator } from "../slice";
+import { DATE_FORMAT } from "../../utils";
 
 const EntryType = {
   debit: "debit",
@@ -30,10 +31,142 @@ export type CashBookSlice = {
 
 export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
   activeDate: dayjs().format("YYYY-MM-DD"),
-  cashBookByDate: {},
+  cashBookByDate: {
+    "2025-11-20": {
+      id: "2025-11-20",
+      date: "2025-11-20",
+      entries: [
+        { id: "e1", account: "Cash", amount: 1000, type: "debit" },
+        { id: "e2", account: "Sales Revenue", amount: 1000, type: "credit" },
+        {
+          id: "e3",
+          account: "Accounts Receivable",
+          amount: 553400,
+          type: "debit",
+        },
+        {
+          id: "e4",
+          account: "Service Revenue",
+          amount: 5053240,
+          type: "credit",
+        },
+        {
+          id: "e5",
+          account: "Equipment",
+          amount: 205400,
+          type: "debit",
+        },
+        {
+          id: "e6",
+          account: "Cash",
+          amount: 23000,
+          type: "credit",
+        },
+      ],
+    },
+    // Sample data
+    "2025-11-26": {
+      id: "2025-11-26",
+      date: "2025-11-26",
+      entries: [
+        { id: "e1", account: "Cash", amount: 1000, type: "debit" },
+        { id: "e2", account: "Sales Revenue", amount: 1000, type: "credit" },
+        {
+          id: "e3",
+          account: "Accounts Receivable",
+          amount: 500,
+          type: "debit",
+        },
+        {
+          id: "e4",
+          account: "Service Revenue",
+          amount: 500,
+          type: "credit",
+        },
+        {
+          id: "e5",
+          account: "Equipment",
+          amount: 2000,
+          type: "debit",
+        },
+        {
+          id: "e6",
+          account: "Cash",
+          amount: 2000,
+          type: "credit",
+        },
+      ],
+    },
+
+    "2025-11-27": {
+      id: "2025-11-27",
+      date: "2025-11-27",
+      entries: [
+        { id: "e1", account: "Cash", amount: 1000, type: "debit" },
+        { id: "e2", account: "Sales Revenue", amount: 1000, type: "credit" },
+        {
+          id: "e3",
+          account: "Accounts Receivable",
+          amount: 553400,
+          type: "debit",
+        },
+        {
+          id: "e4",
+          account: "Service Revenue",
+          amount: 5053240,
+          type: "credit",
+        },
+        {
+          id: "e5",
+          account: "Equipment",
+          amount: 205400,
+          type: "debit",
+        },
+        {
+          id: "e6",
+          account: "Cash",
+          amount: 23000,
+          type: "credit",
+        },
+      ],
+    },
+
+    "2025-11-28": {
+      id: "2025-11-28",
+      date: "2025-11-28",
+      entries: [
+        { id: "e1", account: "Cash", amount: 1000, type: "debit" },
+        { id: "e2", account: "Sales Revenue", amount: 1000, type: "credit" },
+        {
+          id: "e3",
+          account: "Accounts Receivable",
+          amount: 50320,
+          type: "debit",
+        },
+        {
+          id: "e4",
+          account: "Service Revenue",
+          amount: 50340,
+          type: "credit",
+        },
+        {
+          id: "e5",
+          account: "Equipment",
+          amount: 2004230,
+          type: "debit",
+        },
+        {
+          id: "e6",
+          account: "Cash",
+          amount: 202300,
+          type: "credit",
+        },
+      ],
+    },
+  },
 
   setActiveDate: (date: dayjs.Dayjs) =>
     set((state) => {
-      state.activeDate = date.format("YYYY-MM-DD");
+      state.activeDate = date.format(DATE_FORMAT);
     }),
 });
