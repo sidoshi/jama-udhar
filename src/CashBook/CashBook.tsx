@@ -39,6 +39,7 @@ import {
   CompareArrows,
 } from "@mui/icons-material";
 import { DeleteEntryDialog } from "./DeleteEntryDialog";
+import { EditEntryDialog } from "./EditEntryDialog";
 import {
   creditAddAccountAtom,
   debitAddAccountAtom,
@@ -147,6 +148,7 @@ type DNDRowProps = {
 function DNDRow({ entry }: DNDRowProps) {
   const { id, account } = entry;
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const updateEntry = useAppStore((state) => state.updateEntry);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -172,6 +174,10 @@ function DNDRow({ entry }: DNDRowProps) {
     setDeleteDialogOpen(true);
   };
 
+  const onClickEdit = () => {
+    setEditDialogOpen(true);
+  };
+
   const options = [
     {
       label: "Delete Entry",
@@ -191,9 +197,7 @@ function DNDRow({ entry }: DNDRowProps) {
     {
       label: "Edit Entry",
       icon: <DriveFileRenameOutline />,
-      onClick: () => {
-        handleMenuClose();
-      },
+      onClick: onClickEdit,
     },
   ];
 
@@ -279,6 +283,12 @@ function DNDRow({ entry }: DNDRowProps) {
         isOpen={isDeleteDialogOpen}
         entry={entry}
         onClose={() => setDeleteDialogOpen(false)}
+      />
+
+      <EditEntryDialog
+        isOpen={isEditDialogOpen}
+        entry={entry}
+        onClose={() => setEditDialogOpen(false)}
       />
     </>
   );
