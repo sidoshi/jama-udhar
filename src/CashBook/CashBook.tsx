@@ -135,6 +135,7 @@ type DNDRowProps = {
 function DNDRow({ entry }: DNDRowProps) {
   const { id, account } = entry;
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const updateEntry = useAppStore((state) => state.updateEntry);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id,
     data: entry,
@@ -175,7 +176,16 @@ function DNDRow({ entry }: DNDRowProps) {
             </IconButton>
           </Grid>
           <Grid size={5} py={1} alignContent="center">
-            <Typography variant="body1">{account}</Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                textDecoration: entry.checked ? "underline" : "none",
+                textDecorationThickness: "2px",
+                textDecorationStyle: "wavy",
+              }}
+            >
+              {account}
+            </Typography>
             {entry.previousAmmount != null &&
               entry.previousAmmount !== entry.amount &&
               entry.previousAmmount !== 0 && (
@@ -187,10 +197,13 @@ function DNDRow({ entry }: DNDRowProps) {
           <Grid size={6} py={1} textAlign="right">
             <Box display="flex" alignItems="center" justifyContent="flex-end">
               <EntryAmountEditBox entry={entry} />
+              <Checkbox
+                checked={entry.checked}
+                onChange={(_e, checked) => updateEntry({ ...entry, checked })}
+              />
               <IconButton onClick={onClickDelete} color="error" size="small">
                 <Cancel fontSize="small" />
               </IconButton>
-              <Checkbox />
             </Box>
           </Grid>
         </Grid>
@@ -257,6 +270,7 @@ function AddEntryForm({ type }: AddEntryFormProps) {
       account: account.trim(),
       amount: amount,
       previousAmmount: 0,
+      checked: false,
     });
 
     setAccount("");

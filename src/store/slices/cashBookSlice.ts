@@ -37,6 +37,7 @@ export type Entry = {
   previousAmmount: number;
   amount: number;
   type: EntryType;
+  checked: boolean;
 };
 
 export type CashBook = {
@@ -132,6 +133,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
           entryToUpdate.amount = entry.amount;
           entryToUpdate.account = entry.account;
           entryToUpdate.type = entry.type;
+          entryToUpdate.checked = entry.checked;
         }
       }
     }),
