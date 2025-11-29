@@ -10,6 +10,10 @@ import {
   TextField,
   ButtonGroup,
   Checkbox,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import { zip } from "lodash-es";
 import generatePDF from "react-to-pdf";
@@ -25,7 +29,15 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { useAppStore, useEntriesForActiveDate, useUndoRedo } from "../store";
 import { toLocaleRupeeString } from "../utils";
 import dayjs from "dayjs";
-import { Cancel, DragHandle, Undo, Redo } from "@mui/icons-material";
+import {
+  Cancel,
+  DragHandle,
+  Undo,
+  Redo,
+  MoreVert,
+  DriveFileRenameOutline,
+  CompareArrows,
+} from "@mui/icons-material";
 import { DeleteEntryDialog } from "./DeleteEntryDialog";
 import {
   creditAddAccountAtom,
@@ -136,6 +148,17 @@ function DNDRow({ entry }: DNDRowProps) {
   const { id, account } = entry;
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const updateEntry = useAppStore((state) => state.updateEntry);
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(anchorEl);
+
+  function handleMenuOpen(event: React.MouseEvent<HTMLElement>) {
+    setAnchorEl(event.currentTarget);
+  }
+  function handleMenuClose() {
+    setAnchorEl(null);
+  }
+
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id,
     data: entry,
@@ -148,6 +171,31 @@ function DNDRow({ entry }: DNDRowProps) {
   const onClickDelete = () => {
     setDeleteDialogOpen(true);
   };
+
+  const options = [
+    {
+      label: "Delete Entry",
+      icon: <Cancel color="error" />,
+      onClick: onClickDelete,
+    },
+    {
+      label: `Move to ${entry.type === "debit" ? "Credit" : "Debit"}`,
+      icon: <CompareArrows />,
+      onClick: () => {
+        updateEntry({
+          ...entry,
+          type: entry.type === "debit" ? "credit" : "debit",
+        });
+      },
+    },
+    {
+      label: "Edit Entry",
+      icon: <DriveFileRenameOutline />,
+      onClick: () => {
+        handleMenuClose();
+      },
+    },
+  ];
 
   return (
     <>
@@ -201,9 +249,27 @@ function DNDRow({ entry }: DNDRowProps) {
                 checked={entry.checked}
                 onChange={(_e, checked) => updateEntry({ ...entry, checked })}
               />
-              <IconButton onClick={onClickDelete} color="error" size="small">
-                <Cancel fontSize="small" />
+              <IconButton onClick={handleMenuOpen} size="small">
+                <MoreVert />
               </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={menuOpen}
+                onClose={handleMenuClose}
+              >
+                {options.map((option) => (
+                  <MenuItem
+                    key={option.label}
+                    onClick={() => {
+                      option.onClick();
+                      handleMenuClose();
+                    }}
+                  >
+                    <ListItemIcon>{option.icon}</ListItemIcon>
+                    <ListItemText>{option.label}</ListItemText>
+                  </MenuItem>
+                ))}
+              </Menu>
             </Box>
           </Grid>
         </Grid>
