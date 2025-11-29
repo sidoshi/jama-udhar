@@ -1,8 +1,7 @@
 import { TextField, Box, Typography } from "@mui/material";
 import { useAtomValue, useSetAtom } from "jotai";
-import { evaluate } from "mathjs";
 import { useRef, useState, useCallback, useEffect } from "react";
-import { isValid } from "../math";
+import { evaluate, isValid } from "../math";
 import { useAppStore } from "../store";
 import {
   type Entry,
@@ -30,6 +29,11 @@ export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
     setEditValue(entry.amount.toString());
   };
 
+  const closeEditBox = useCallback(() => {
+    setEditBoxId(undefined);
+    setEditValue(entry.amount.toString());
+  }, [entry.amount, setEditBoxId]);
+
   const onSubmitOrBlur = useCallback(() => {
     if (!isValid(editValue)) {
       return;
@@ -44,9 +48,9 @@ export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
     }
     // Use setTimeout to ensure the blur event completes before unmounting
     setTimeout(() => {
-      setEditBoxId(undefined);
+      closeEditBox();
     }, 0);
-  }, [editValue, entry, updateEntry, setEditBoxId]);
+  }, [editValue, entry, updateEntry, closeEditBox]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditValue(e.target.value);
@@ -54,12 +58,18 @@ export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
 
   useEffect(() => {
     if (isEntryEditActive) {
+      setEditValue(entry.amount.toString());
       requestAnimationFrame(() => {
         setTimeout(() => {
           inputRef.current?.focus();
+          inputRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
         }, 300);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEntryEditActive]);
 
   return isEntryEditActive ? (
@@ -75,7 +85,7 @@ export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
           onSubmitOrBlur();
         }
         if (e.key === "Escape") {
-          setEditBoxId(undefined);
+          closeEditBox();
         }
       }}
     />
