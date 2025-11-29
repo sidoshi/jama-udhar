@@ -51,7 +51,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
             color: "#000",
           }}
         >
-          Debit + જમા
+          Credit + જમા
         </th>
         <th
           style={{
@@ -75,7 +75,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
             color: "#000",
           }}
         >
-          Credit - ઉધાર
+          Debit - ઉધાર
         </th>
       </tr>
     </thead>
@@ -83,34 +83,13 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
 
   const renderTableentries = (pageentries: typeof entries) => (
     <tbody>
-      {pageentries.map(([debitAccount, creditAccount], index) => (
+      {pageentries.map(([creditAccount, debitAccount], index) => (
         <tr
           key={index}
           style={{
             backgroundColor: index % 2 === 0 ? "#fff" : "#f9f9f9",
           }}
         >
-          <td
-            style={{
-              border: "1px solid #ddd",
-              padding: "12px 10px",
-              color: "#000",
-            }}
-          >
-            {debitAccount?.account || ""}
-          </td>
-          <td
-            style={{
-              border: "1px solid #ddd",
-              padding: "12px 10px",
-              textAlign: "right",
-              color: "#000",
-            }}
-          >
-            {debitAccount
-              ? `+ ${toLocaleRupeeString(debitAccount.amount)}`
-              : ""}
-          </td>
           <td
             style={{
               border: "1px solid #ddd",
@@ -129,7 +108,28 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
             }}
           >
             {creditAccount
-              ? `- ${toLocaleRupeeString(Math.abs(creditAccount.amount))}`
+              ? `+ ${toLocaleRupeeString(creditAccount.amount)}`
+              : ""}
+          </td>
+          <td
+            style={{
+              border: "1px solid #ddd",
+              padding: "12px 10px",
+              color: "#000",
+            }}
+          >
+            {debitAccount?.account || ""}
+          </td>
+          <td
+            style={{
+              border: "1px solid #ddd",
+              padding: "12px 10px",
+              textAlign: "right",
+              color: "#000",
+            }}
+          >
+            {debitAccount
+              ? `- ${toLocaleRupeeString(Math.abs(debitAccount.amount))}`
               : ""}
           </td>
         </tr>
@@ -173,7 +173,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
               fontWeight: "bold",
             }}
           >
-            + {toLocaleRupeeString(debitTotal)}
+            + {toLocaleRupeeString(creditTotal)}
           </td>
           <td
             style={{
@@ -194,7 +194,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
               fontWeight: "bold",
             }}
           >
-            - {toLocaleRupeeString(Math.abs(creditTotal))}
+            - {toLocaleRupeeString(Math.abs(debitTotal))}
           </td>
         </tr>
       </tbody>

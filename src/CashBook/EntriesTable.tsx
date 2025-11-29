@@ -71,7 +71,7 @@ export function EntriesTable({ title, entries, type }: TableProps) {
               </Grid>
             )}
 
-            {entries.reverse().map((entry) => (
+            {entries.map((entry) => (
               <DNDRow key={entry.id} entry={entry} />
             ))}
           </Grid>
@@ -81,7 +81,6 @@ export function EntriesTable({ title, entries, type }: TableProps) {
         <Box
           sx={{
             position: "sticky",
-
             bottom: 0,
             backgroundColor: "background.paper",
             p: 2,

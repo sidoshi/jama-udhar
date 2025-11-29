@@ -34,7 +34,11 @@ export const getEntriesForCashBook = (cashBook?: CashBook) => {
   const debitEntries = entries.filter((e) => e.type === "debit");
   const creditEntries = entries.filter((e) => e.type === "credit");
 
-  return { debit: debitEntries, credit: creditEntries, date: cashBook?.date };
+  return {
+    debit: debitEntries.reverse(),
+    credit: creditEntries.reverse(),
+    date: cashBook?.date,
+  };
 };
 
 export const getMostRecentCashBook = (activeDate: string) => {
