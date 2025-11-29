@@ -81,13 +81,16 @@ export function EntriesTable({ title, entries, type }: TableProps) {
         <Box
           sx={{
             position: "sticky",
+
             bottom: 0,
             backgroundColor: "background.paper",
             p: 2,
             pt: 1,
             textAlign: "right",
             borderTop: 1,
+            color: type === "debit" ? "error.dark" : "success.dark",
             borderColor: "divider",
+            borderBottom: "1px solid",
           }}
         >
           <Typography variant="h4" fontWeight="bold">

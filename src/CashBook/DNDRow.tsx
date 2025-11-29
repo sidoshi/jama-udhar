@@ -69,7 +69,9 @@ export function DNDRow({ entry }: DNDRowProps) {
       onClick: onClickDelete,
     },
     {
-      label: `Move to ${entry.type === "debit" ? "Credit" : "Debit"}`,
+      label: `Move to ${
+        entry.type === "debit" ? "Credit (જમા)" : "Debit (ઉધાર)"
+      }`,
       icon: <CompareArrows />,
       onClick: () => {
         updateEntry({

@@ -167,13 +167,13 @@ export function CashBook() {
           <EntriesTable
             type="credit"
             id="credit"
-            title="Credit"
+            title="Credit (જમા)"
             entries={entries.credit}
           />
           <EntriesTable
             type="debit"
             id="debit"
-            title="Debit"
+            title="Debit (ઉધાર)"
             entries={entries.debit}
           />
         </Box>

@@ -17,7 +17,7 @@ export function CashBookRoot() {
     <Box
       sx={{
         borderTop: debitTotal === creditTotal ? "6px solid" : "none",
-        borderColor: "success.main",
+        borderColor: "success.dark",
       }}
     >
       <Grid container spacing={2}>
@@ -30,7 +30,9 @@ export function CashBookRoot() {
             }}
           />
 
-          <Paper sx={{ p: 2, m: 2 }}>
+          <Paper
+            sx={{ p: 2, m: 2, border: "1px solid", borderColor: "divider" }}
+          >
             <Typography variant="h6">
               Balance: {toLocaleRupeeString(debitTotal - creditTotal)}
             </Typography>

@@ -108,8 +108,8 @@ export function EditEntryDialog({
               label="Type"
               onChange={(e) => setType(e.target.value as Entry["type"])}
             >
-              <MenuItem value="debit">Debit</MenuItem>
-              <MenuItem value="credit">Credit</MenuItem>
+              <MenuItem value="debit">Debit (ઉધાર)</MenuItem>
+              <MenuItem value="credit">Credit (જમા)</MenuItem>
             </Select>
           </FormControl>
 

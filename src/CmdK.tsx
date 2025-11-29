@@ -71,7 +71,7 @@ export const Example = () => {
         ],
       },
       {
-        heading: "Debit",
+        heading: "Debit (ઉધાર)",
         id: "debit",
         items: [
           ...entries.debit.map((e) => ({
@@ -86,7 +86,7 @@ export const Example = () => {
       },
 
       {
-        heading: "Credit",
+        heading: "Credit (જમા)",
         id: "credit",
         items: [
           ...entries.credit.map((e) => ({
@@ -105,7 +105,7 @@ export const Example = () => {
         items: [
           {
             id: "add-debit",
-            children: `Add: ${search.toUpperCase()} to Debit`,
+            children: `Debit (ઉધાર): ${search.toUpperCase()}`,
             icon: AddBox,
             onClick: () => {
               setDebitAddAccount(search.toUpperCase());
@@ -113,7 +113,7 @@ export const Example = () => {
           },
           {
             id: "add-credit",
-            children: `Add: ${search.toUpperCase()} to Credit`,
+            children: `Credit (જમા): ${search.toUpperCase()}`,
             icon: AddBox,
             onClick: () => {
               setCreditAddAccount(search.toUpperCase());
