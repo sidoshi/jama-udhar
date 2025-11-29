@@ -1,4 +1,4 @@
-import { TextField, Button } from "@mui/material";
+import { TextField, Box, Typography } from "@mui/material";
 import { useAtomValue, useSetAtom } from "jotai";
 import { evaluate } from "mathjs";
 import { useRef, useState, useCallback, useEffect } from "react";
@@ -80,8 +80,34 @@ export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
       }}
     />
   ) : (
-    <Button fullWidth size="large" onClick={onClickEdit} variant="outlined">
-      {toLocaleRupeeString(entry.amount)}
-    </Button>
+    <Box
+      onClick={onClickEdit}
+      sx={{
+        width: "100%",
+        padding: "8px 14px",
+        minHeight: "40px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        cursor: "pointer",
+        border: "1px solid transparent",
+        borderRadius: "4px",
+        backgroundColor: "transparent",
+        transition: "all 0.2s ease-in-out",
+        "&:hover": {
+          backgroundColor: "action.hover",
+          border: "1px solid",
+          borderColor: "divider",
+        },
+        "&:focus": {
+          outline: "2px solid",
+          outlineColor: "primary.main",
+          outlineOffset: "1px",
+        },
+      }}
+      tabIndex={0}
+    >
+      <Typography variant="h6">{toLocaleRupeeString(entry.amount)}</Typography>
+    </Box>
   );
 }

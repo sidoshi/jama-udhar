@@ -15,44 +15,81 @@ export function EntriesTable({ title, entries, type }: TableProps) {
   return (
     <Box sx={{ flex: 1, minWidth: 300 }}>
       <Paper
+        id={`${type}-entries-table`}
         sx={{
-          p: 2,
           minHeight: 400,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <AddEntryForm type={type} />
-        <Grid container>
-          <Grid container size={12} px={1}>
-            <Grid size={8}>
-              <Typography variant="subtitle1" fontWeight="bold">
-                {title}
-              </Typography>
+        {/* Sticky Header */}
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            backgroundColor: "background.paper",
+            zIndex: 1,
+            p: 2,
+            pb: 0,
+          }}
+        >
+          <AddEntryForm type={type} />
+          <Grid container>
+            <Grid container size={12} px={1}>
+              <Grid size={7}>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  {title}
+                </Typography>
+              </Grid>
+              <Grid size={5} textAlign="left">
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Amount
+                </Typography>
+              </Grid>
             </Grid>
-            <Grid size={4} textAlign="right">
-              <Typography variant="subtitle1" fontWeight="bold">
-                Amount
-              </Typography>
+
+            <Grid size={12}>
+              <Divider sx={{ my: 1 }} />
             </Grid>
           </Grid>
+        </Box>
 
-          <Grid size={12}>
-            <Divider sx={{ my: 1 }} />
+        {/* Scrollable Content */}
+        <Box
+          sx={{
+            flex: 1,
+            overflow: "auto",
+            px: 2,
+          }}
+        >
+          <Grid container>
+            {entries.length === 0 && (
+              <Grid size={12} py={10} textAlign="center">
+                <Typography variant="body2" color="textSecondary">
+                  No entries available.
+                </Typography>
+              </Grid>
+            )}
+
+            {entries.reverse().map((entry) => (
+              <DNDRow key={entry.id} entry={entry} />
+            ))}
           </Grid>
+        </Box>
 
-          {entries.length === 0 && (
-            <Grid size={12} py={10} textAlign="center">
-              <Typography variant="body2" color="textSecondary">
-                No entries available.
-              </Typography>
-            </Grid>
-          )}
-
-          {entries.reverse().map((entry) => (
-            <DNDRow key={entry.id} entry={entry} />
-          ))}
-        </Grid>
-
-        <Box sx={{ mt: 2, textAlign: "right" }}>
+        {/* Sticky Footer */}
+        <Box
+          sx={{
+            position: "sticky",
+            bottom: 0,
+            backgroundColor: "background.paper",
+            p: 2,
+            pt: 1,
+            textAlign: "right",
+            borderTop: 1,
+            borderColor: "divider",
+          }}
+        >
           <Typography variant="h4" fontWeight="bold">
             Total:{" "}
             {toLocaleRupeeString(entries.reduce((sum, e) => sum + e.amount, 0))}
