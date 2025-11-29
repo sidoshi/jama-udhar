@@ -115,13 +115,8 @@ export function CashBook() {
           <Box>
             <Typography variant="h4">Accounting Sheet</Typography>
             {entries.date != null && entries.date !== activeDate && (
-              <Typography
-                variant="subtitle2"
-                color="textSecondary"
-                gutterBottom
-              >
-                Showing last recent entries from{" "}
-                {dayjs(entries.date).format("DD MMM YYYY")}
+              <Typography variant="subtitle2" color="info.main" gutterBottom>
+                Showing entries from {dayjs(entries.date).format("DD MMM YYYY")}
               </Typography>
             )}
           </Box>

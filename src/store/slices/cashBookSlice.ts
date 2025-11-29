@@ -57,6 +57,8 @@ export type CashBookSlice = {
   updateEntry: (entry: Entry) => void;
 
   loadToCleanStateFromPDF: (cashBook: CashBook) => void;
+
+  deleteCashBookByDate: (date: string) => void;
 };
 
 export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
@@ -71,6 +73,11 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
           [cashBook.date]: cashBook,
         },
       };
+    }),
+
+  deleteCashBookByDate: (date: string) =>
+    set((state) => {
+      delete state.cashBookByDate[date];
     }),
 
   setActiveDate: (date: dayjs.Dayjs) =>
