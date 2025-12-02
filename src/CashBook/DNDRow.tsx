@@ -1,7 +1,6 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import {
   Cancel,
-  CompareArrows,
   DriveFileRenameOutline,
   DragHandle,
   MoreVert,
@@ -68,18 +67,7 @@ export function DNDRow({ entry }: DNDRowProps) {
       icon: <Cancel color="error" />,
       onClick: onClickDelete,
     },
-    {
-      label: `Move to ${
-        entry.type === "debit" ? "Credit (જમા)" : "Debit (ઉધાર)"
-      }`,
-      icon: <CompareArrows />,
-      onClick: () => {
-        updateEntry({
-          ...entry,
-          type: entry.type === "debit" ? "credit" : "debit",
-        });
-      },
-    },
+
     {
       label: "Edit Entry",
       icon: <DriveFileRenameOutline />,

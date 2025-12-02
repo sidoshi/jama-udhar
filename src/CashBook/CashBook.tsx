@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { Paper, Typography, Box, Button, ButtonGroup } from "@mui/material";
+import { Paper, Typography, Box } from "@mui/material";
 import { zip } from "lodash-es";
 import generatePDF from "react-to-pdf";
 import {
@@ -10,9 +10,8 @@ import {
   type UniqueIdentifier,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { useAppStore, useEntriesForActiveDate, useUndoRedo } from "../store";
+import { useAppStore, useEntriesForActiveDate } from "../store";
 import dayjs from "dayjs";
-import { Undo, Redo } from "@mui/icons-material";
 import {
   printPdfAtom,
   type CashBook,
@@ -25,13 +24,12 @@ import {
 } from "./EntryTransferDialog";
 import { useAtom } from "jotai";
 import { PDFLedger } from "./PDFLedger";
-import { handlePDFRestore } from "../pdfRestore";
 import { EntriesTable } from "./EntriesTable";
+import { AddEntryForm } from "./AddEntryForm";
 
 export function CashBook() {
   const activeDate = useAppStore((state) => state.activeDate);
   const entries = useEntriesForActiveDate();
-  const { canUndo, canRedo, undo, redo } = useUndoRedo();
   const [transfer, setTransfer] =
     useState<EntryTransferDialogProps["transfer"]>();
 
@@ -97,7 +95,7 @@ export function CashBook() {
     >
       {isPrinting && (
         <PDFLedger
-          balance={debitTotal - creditTotal}
+          balance={debitTotal + creditTotal}
           entries={entryPairs}
           debitTotal={debitTotal}
           creditTotal={creditTotal}
@@ -109,56 +107,13 @@ export function CashBook() {
         onClose={() => setTransfer(undefined)}
       />
       <Box p={2}>
-        <Box
-          mb={4}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Box>
-            <Typography variant="h4">Accounting Sheet</Typography>
-            {entries.date != null && entries.date !== activeDate && (
-              <Typography variant="subtitle2" color="info.main" gutterBottom>
-                Showing entries from {dayjs(entries.date).format("DD MMM YYYY")}
-              </Typography>
-            )}
-          </Box>
-          <Box display="flex" gap={1}>
-            <ButtonGroup variant="outlined" aria-label="Basic button group">
-              <Button
-                variant="outlined"
-                onClick={handlePDFRestore}
-                color="primary"
-              >
-                Restore from PDF
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={() => setIsPrinting(true)}
-                color="primary"
-              >
-                Print / Export PDF
-              </Button>
-            </ButtonGroup>
-
-            <ButtonGroup variant="outlined" aria-label="Basic button group">
-              <Button
-                onClick={() => undo()}
-                disabled={!canUndo}
-                color="primary"
-              >
-                <Undo />
-              </Button>
-
-              <Button
-                onClick={() => redo()}
-                disabled={!canRedo}
-                color="primary"
-              >
-                <Redo />
-              </Button>
-            </ButtonGroup>
-          </Box>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <AddEntryForm />
+          {entries.date != null && entries.date !== activeDate && (
+            <Typography variant="subtitle2" color="info.main" gutterBottom>
+              Showing entries from {dayjs(entries.date).format("DD MMM YYYY")}
+            </Typography>
+          )}
         </Box>
 
         <Box sx={{ display: "flex", gap: 1, mt: 1 }}>

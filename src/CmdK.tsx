@@ -11,8 +11,7 @@ import { useAppStore, useEntriesForActiveDate } from "./store";
 import { toLocaleRupeeString } from "./utils";
 import { useSetAtom } from "jotai";
 import {
-  creditAddAccountAtom,
-  debitAddAccountAtom,
+  addAccountAtom,
   printPdfAtom,
   setEditBoxIdAtom,
 } from "./store/slices/cashBookSlice";
@@ -94,8 +93,7 @@ export const CmdK = () => {
 
   const activeDate = useAppStore((state) => state.activeDate);
 
-  const setDebitAddAccount = useSetAtom(debitAddAccountAtom);
-  const setCreditAddAccount = useSetAtom(creditAddAccountAtom);
+  const setAddAccount = useSetAtom(addAccountAtom);
 
   const [cashBookToDeleteDate, setCashBookToDeleteDate] = useState<
     string | null
@@ -176,19 +174,11 @@ export const CmdK = () => {
         id: "add",
         items: [
           {
-            id: "add-debit",
-            children: `Debit (ઉધાર): ${search.toUpperCase()}`,
+            id: "add",
+            children: `Add: ${search.toUpperCase()}`,
             icon: AddBox,
             onClick: () => {
-              setDebitAddAccount(search.toUpperCase());
-            },
-          },
-          {
-            id: "add-credit",
-            children: `Credit (જમા): ${search.toUpperCase()}`,
-            icon: AddBox,
-            onClick: () => {
-              setCreditAddAccount(search.toUpperCase());
+              setAddAccount(search.toUpperCase());
             },
           },
         ],

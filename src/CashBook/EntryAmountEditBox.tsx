@@ -98,7 +98,7 @@ export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
         minHeight: "40px",
         display: "flex",
         alignItems: "center",
-        color: entry.type === "debit" ? "error.dark" : "success.dark",
+        color: entry.amount < 0 ? "error.dark" : "success.dark",
         justifyContent: "flex-start",
         cursor: "pointer",
         border: "1px solid transparent",

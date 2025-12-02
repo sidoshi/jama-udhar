@@ -21,23 +21,14 @@ export const setEditBoxIdAtom = atom(
   }
 );
 
-export const debitAddAccountAtom = atom<string>("");
-export const creditAddAccountAtom = atom<string>("");
+export const addAccountAtom = atom<string>("");
 export const celebrationEnabledAtom = atom<boolean>(true);
-
-const EntryType = {
-  debit: "debit",
-  credit: "credit",
-} as const;
-
-type EntryType = (typeof EntryType)[keyof typeof EntryType];
 
 export type Entry = {
   id: string;
   account: string;
   previousAmmount: number;
   amount: number;
-  type: EntryType;
   checked: boolean;
 };
 
@@ -140,7 +131,6 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
         if (entryToUpdate != null) {
           entryToUpdate.amount = entry.amount;
           entryToUpdate.account = entry.account;
-          entryToUpdate.type = entry.type;
           entryToUpdate.checked = entry.checked;
         }
       }

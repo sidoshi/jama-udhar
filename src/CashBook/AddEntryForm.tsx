@@ -3,11 +3,7 @@ import dayjs from "dayjs";
 import { useAtom } from "jotai";
 import { useState, useRef, useEffect } from "react";
 import { useAppStore } from "../store";
-import {
-  type Entry,
-  debitAddAccountAtom,
-  creditAddAccountAtom,
-} from "../store/slices/cashBookSlice";
+import { addAccountAtom } from "../store/slices/cashBookSlice";
 import { toLocaleRupeeString } from "../utils";
 
 function parseNumber(value: string): number | null {
@@ -18,15 +14,9 @@ function parseNumber(value: string): number | null {
   return numberValue;
 }
 
-type AddEntryFormProps = {
-  type: Entry["type"];
-};
-
-export function AddEntryForm({ type }: AddEntryFormProps) {
+export function AddEntryForm() {
   const addEntry = useAppStore((state) => state.addEntry);
-  const [account, setAccount] = useAtom(
-    type === "debit" ? debitAddAccountAtom : creditAddAccountAtom
-  );
+  const [account, setAccount] = useAtom(addAccountAtom);
   const [amount, setAmount] = useState<number | "" | "-">("");
   const accountRef = useRef<HTMLInputElement>(null);
 
@@ -65,8 +55,7 @@ export function AddEntryForm({ type }: AddEntryFormProps) {
     }
 
     addEntry({
-      id: `${type}-${dayjs().unix()}`,
-      type,
+      id: `${account.trim()}-${dayjs().unix()}`,
       account: account.trim(),
       amount: amount,
       previousAmmount: 0,

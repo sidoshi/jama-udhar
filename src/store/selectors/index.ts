@@ -31,8 +31,8 @@ function findMostRecentDateBefore(activeDate: string, dates: string[]) {
 
 export const getEntriesForCashBook = (cashBook?: CashBook) => {
   const entries = cashBook ? cashBook.entries : [];
-  const debitEntries = entries.filter((e) => e.type === "debit");
-  const creditEntries = entries.filter((e) => e.type === "credit");
+  const debitEntries = entries.filter((e) => e.amount < 0);
+  const creditEntries = entries.filter((e) => e.amount >= 0);
 
   return {
     debit: debitEntries.reverse(),

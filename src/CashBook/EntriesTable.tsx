@@ -1,13 +1,12 @@
 import { Box, Paper, Grid, Typography, Divider } from "@mui/material";
 import type { Entry } from "../store/slices/cashBookSlice";
 import { toLocaleRupeeString } from "../utils";
-import { AddEntryForm } from "./AddEntryForm";
 import { DNDRow } from "./DNDRow";
 
 type TableProps = {
   id: string;
   title: string;
-  type: Entry["type"];
+  type: "debit" | "credit";
   entries: Entry[];
 };
 
@@ -33,7 +32,6 @@ export function EntriesTable({ title, entries, type }: TableProps) {
             pb: 0,
           }}
         >
-          <AddEntryForm type={type} />
           <Grid container>
             <Grid container size={12} px={1}>
               <Grid size={7}>

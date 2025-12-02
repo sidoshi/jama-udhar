@@ -6,10 +6,18 @@ import {
   IconButton,
   Tooltip,
   Divider,
+  Button,
+  ButtonGroup,
 } from "@mui/material";
 import { CashBook } from "./CashBook";
-import { useEntriesForActiveDate } from "../store";
-import { WarningRounded, CheckCircle, Stars } from "@mui/icons-material";
+import { useEntriesForActiveDate, useUndoRedo } from "../store";
+import {
+  WarningRounded,
+  CheckCircle,
+  Stars,
+  Redo,
+  Undo,
+} from "@mui/icons-material";
 import { toLocaleRupeeString } from "../utils";
 import { Celebration } from "../components/Celebration";
 import { useAtom } from "jotai";
@@ -23,7 +31,8 @@ export function CashBookRoot() {
     celebrationEnabledAtom
   );
 
-  const isBalanced = debitTotal === creditTotal && debitTotal > 0;
+  const { canUndo, canRedo, undo, redo } = useUndoRedo();
+  const isBalanced = debitTotal + creditTotal === 0 && creditTotal > 0;
 
   return (
     <Box
@@ -65,7 +74,7 @@ export function CashBookRoot() {
               alignItems="center"
             >
               <Typography variant="h6">
-                Balance: {toLocaleRupeeString(debitTotal - creditTotal)}
+                Balance: {toLocaleRupeeString(debitTotal + creditTotal)}
               </Typography>
               <Tooltip
                 title={`${
@@ -110,9 +119,32 @@ export function CashBookRoot() {
               borderColor: "divider",
             }}
           >
-            <Typography variant="h6" mb={2}>
-              Recent Activity
-            </Typography>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              flexDirection="row"
+              mb={2}
+            >
+              <Typography variant="h6">Recent Activity</Typography>
+              <ButtonGroup variant="outlined" aria-label="Basic button group">
+                <Button
+                  onClick={() => undo()}
+                  disabled={!canUndo}
+                  color="primary"
+                >
+                  <Undo />
+                </Button>
+
+                <Button
+                  onClick={() => redo()}
+                  disabled={!canRedo}
+                  color="primary"
+                >
+                  <Redo />
+                </Button>
+              </ButtonGroup>
+            </Box>
 
             <Divider />
             <Box p={1}>

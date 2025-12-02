@@ -5,10 +5,6 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   FormControlLabel,
   Checkbox,
   Box,
@@ -33,13 +29,11 @@ export function EditEntryDialog({
 
   const [account, setAccount] = useState(entry.account);
   const [amount, setAmount] = useState(entry.amount.toString());
-  const [type, setType] = useState<Entry["type"]>(entry.type);
   const [checked, setChecked] = useState(entry.checked);
 
   const handleDialogEnter = () => {
     setAccount(entry.account);
     setAmount(entry.amount.toString());
-    setType(entry.type);
     setChecked(entry.checked);
   };
 
@@ -61,7 +55,6 @@ export function EditEntryDialog({
       ...entry,
       account: account.trim(),
       amount: numericAmount,
-      type,
       checked,
     });
 
@@ -100,18 +93,6 @@ export function EditEntryDialog({
             required
             helperText="You can enter mathematical expressions like 100+50"
           />
-
-          <FormControl fullWidth>
-            <InputLabel>Type</InputLabel>
-            <Select
-              value={type}
-              label="Type"
-              onChange={(e) => setType(e.target.value as Entry["type"])}
-            >
-              <MenuItem value="debit">Debit (ઉધાર)</MenuItem>
-              <MenuItem value="credit">Credit (જમા)</MenuItem>
-            </Select>
-          </FormControl>
 
           <FormControlLabel
             control={
