@@ -18,11 +18,12 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useAppStore } from "../store";
-import type { Entry } from "../store/slices/cashBookSlice";
+import { editBoxIdAtom, type Entry } from "../store/slices/cashBookSlice";
 import { toLocaleRupeeString } from "../utils";
 import { DeleteEntryDialog } from "./DeleteEntryDialog";
 import { EditEntryDialog } from "./EditEntryDialog";
 import { EntryAmountEditBox } from "./EntryAmountEditBox";
+import { useAtomValue } from "jotai";
 
 type DNDRowProps = {
   entry: Entry;
@@ -33,6 +34,10 @@ export function DNDRow({ entry }: DNDRowProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const updateEntry = useAppStore((state) => state.updateEntry);
+  const activeDate = useAppStore((state) => state.activeDate);
+
+  const editBoxId = useAtomValue(editBoxIdAtom);
+  const isEntryEditActive = editBoxId === `${activeDate}-${entry.id}`;
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
@@ -74,6 +79,12 @@ export function DNDRow({ entry }: DNDRowProps) {
       onClick: onClickEdit,
     },
   ];
+
+  const isHidden = entry.amount === 0 && !isEntryEditActive;
+
+  if (isHidden) {
+    return null;
+  }
 
   return (
     <>

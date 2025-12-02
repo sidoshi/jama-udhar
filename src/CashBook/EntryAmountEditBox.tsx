@@ -16,12 +16,12 @@ type EntryAmountEditBoxProps = {
 
 export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
   const updateEntry = useAppStore((state) => state.updateEntry);
-  const editBoxId = useAtomValue(editBoxIdAtom);
   const setEditBoxId = useSetAtom(setEditBoxIdAtom);
   const activeDate = useAppStore((state) => state.activeDate);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [editValue, setEditValue] = useState(entry.amount.toString());
+  const editBoxId = useAtomValue(editBoxIdAtom);
   const isEntryEditActive = editBoxId === `${activeDate}-${entry.id}`;
 
   const onClickEdit = () => {
