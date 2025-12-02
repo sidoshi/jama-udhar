@@ -48,6 +48,7 @@ export function CashBook() {
           id: activeDate,
           date: activeDate,
           entries: [...entries.debit, ...entries.credit],
+          activityLog: [],
         };
         pdf.setProperties({
           title: JSON.stringify(hidden),

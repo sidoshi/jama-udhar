@@ -10,7 +10,11 @@ import {
   ButtonGroup,
 } from "@mui/material";
 import { CashBook } from "./CashBook";
-import { useEntriesForActiveDate, useUndoRedo } from "../store";
+import {
+  useActivityLogForActiveDate,
+  useEntriesForActiveDate,
+  useUndoRedo,
+} from "../store";
 import {
   WarningRounded,
   CheckCircle,
@@ -21,18 +25,53 @@ import {
 import { toLocaleRupeeString } from "../utils";
 import { Celebration } from "../components/Celebration";
 import { useAtom } from "jotai";
-import { celebrationEnabledAtom } from "../store/slices/cashBookSlice";
+import {
+  celebrationEnabledAtom,
+  type ActivityLog,
+} from "../store/slices/cashBookSlice";
+
+function ActivityLogEntry({ log }: { log: ActivityLog }) {
+  return (
+    <>
+      <Divider />
+      <Box p={1}>
+        <Typography variant="body2" color="textSecondary">
+          {log.kind === "add" &&
+            `Added entry ${log.account}, amount: ${toLocaleRupeeString(
+              log.amount
+            )}`}
+
+          {log.kind === "delete" &&
+            `Deleted entry ${log.account}, amount: ${toLocaleRupeeString(
+              log.amount
+            )}`}
+
+          {log.kind === "update" &&
+            `Updated entry ${log.account}, amount: ${toLocaleRupeeString(
+              log.oldAmount
+            )} to ${toLocaleRupeeString(log.newAmount)}`}
+
+          {log.kind === "init" && `Initialized new hisab from ${log.date}`}
+        </Typography>
+      </Box>
+      <Divider />
+    </>
+  );
+}
 
 export function CashBookRoot() {
   const entries = useEntriesForActiveDate();
   const debitTotal = entries.debit.reduce((sum, e) => sum + e.amount, 0);
   const creditTotal = entries.credit.reduce((sum, e) => sum + e.amount, 0);
+  const recentActivity = useActivityLogForActiveDate();
   const [celebrationEnabled, setCelebrationEnabled] = useAtom(
     celebrationEnabledAtom
   );
 
   const { canUndo, canRedo, undo, redo } = useUndoRedo();
   const isBalanced = debitTotal + creditTotal === 0 && creditTotal > 0;
+
+  console.log("Rendering CashBookRoot - isBalanced:", recentActivity);
 
   return (
     <Box
@@ -146,14 +185,24 @@ export function CashBookRoot() {
               </ButtonGroup>
             </Box>
 
-            <Divider />
-            <Box p={1}>
-              <Typography variant="body1">MANISH</Typography>
-              <Typography variant="body2" color="textSecondary">
-                BEFORE: 30,000 | AFTER: 20,000
-              </Typography>
-            </Box>
-            <Divider />
+            {recentActivity.length === 0 && (
+              <>
+                <Divider />
+                <Box p={1}>
+                  <Typography variant="body2" color="textSecondary">
+                    No recent activity.
+                  </Typography>
+                </Box>
+                <Divider />
+              </>
+            )}
+
+            {recentActivity.map((log) => (
+              <ActivityLogEntry
+                log={log}
+                key={`${log.kind}-${log.timestamp}`}
+              />
+            ))}
           </Paper>
         </Grid>
         <Grid size={9} height="calc(100vh - 73px)" overflow="auto">

@@ -59,7 +59,15 @@ export const getCopiedFromMostRecentCashBook = (activeDate: string) => {
       entries: mostRecentCashBook.entries.map((entry) => ({
         ...entry,
         previousAmmount: entry.amount,
+        checked: false,
       })),
+      activityLog: [
+        {
+          timestamp: dayjs().unix().toString(),
+          kind: "init" as const,
+          date: mostRecentCashBook.date,
+        },
+      ],
       date: activeDate,
       id: activeDate,
     };
@@ -77,4 +85,14 @@ export const useEntriesForActiveDate = () => {
   }
 
   return getEntriesForCashBook(cashBook);
+};
+
+export const useActivityLogForActiveDate = () => {
+  const activeDate = useAppStore((state) => state.activeDate);
+  const cashBook: CashBook | undefined = useAppStore(
+    useShallow((state) => state.cashBookByDate[activeDate])
+  );
+
+  const log = cashBook?.activityLog ?? [];
+  return [...log].reverse();
 };

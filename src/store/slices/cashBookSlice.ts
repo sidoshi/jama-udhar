@@ -32,10 +32,37 @@ export type Entry = {
   checked: boolean;
 };
 
+export type ActivityLog =
+  | {
+      timestamp: string;
+      kind: "add";
+      account: string;
+      amount: number;
+    }
+  | {
+      timestamp: string;
+      kind: "delete";
+      account: string;
+      amount: number;
+    }
+  | {
+      timestamp: string;
+      kind: "update";
+      account: string;
+      oldAmount: number;
+      newAmount: number;
+    }
+  | {
+      timestamp: string;
+      kind: "init";
+      date: string;
+    };
+
 export type CashBook = {
   id: string;
   date: string;
   entries: Entry[];
+  activityLog: ActivityLog[];
 };
 
 export type CashBookSlice = {
@@ -88,7 +115,18 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
       }
       const cashBook = state.cashBookByDate[state.activeDate];
       if (cashBook) {
+        const entryToDelete = cashBook.entries.find((e) => e.id === entryId);
+        if (entryToDelete == null) {
+          return;
+        }
         cashBook.entries = cashBook.entries.filter((e) => e.id !== entryId);
+        cashBook.activityLog = cashBook.activityLog || [];
+        cashBook.activityLog.push({
+          timestamp: dayjs().unix().toString(),
+          kind: "delete" as const,
+          account: entryToDelete.account,
+          amount: entryToDelete.amount,
+        });
       }
     }),
 
@@ -105,6 +143,13 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
             id: state.activeDate,
             date: state.activeDate,
             entries: [],
+            activityLog: [
+              {
+                timestamp: dayjs().unix().toString(),
+                kind: "init" as const,
+                date: state.activeDate,
+              },
+            ],
           };
         }
       }
@@ -112,6 +157,13 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
       const cashBook = state.cashBookByDate[state.activeDate];
       if (cashBook) {
         cashBook.entries.push(entry);
+        cashBook.activityLog = cashBook.activityLog || [];
+        cashBook.activityLog.push({
+          timestamp: dayjs().unix().toString(),
+          kind: "add" as const,
+          account: entry.account,
+          amount: entry.amount,
+        });
       }
     }),
 
@@ -129,9 +181,22 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
       if (cashBook) {
         const entryToUpdate = cashBook.entries.find((e) => e.id === entry.id);
         if (entryToUpdate != null) {
+          const oldAmount = entryToUpdate.amount;
+
           entryToUpdate.amount = entry.amount;
           entryToUpdate.account = entry.account;
           entryToUpdate.checked = entry.checked;
+
+          cashBook.activityLog = cashBook.activityLog || [];
+          if (oldAmount !== entry.amount) {
+            cashBook.activityLog.push({
+              timestamp: dayjs().unix().toString(),
+              kind: "update" as const,
+              account: entry.account,
+              oldAmount,
+              newAmount: entry.amount,
+            });
+          }
         }
       }
     }),
