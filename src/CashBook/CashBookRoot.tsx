@@ -5,6 +5,7 @@ import {
   Typography,
   IconButton,
   Tooltip,
+  Divider,
 } from "@mui/material";
 import { CashBook } from "./CashBook";
 import { useEntriesForActiveDate } from "../store";
@@ -43,19 +44,19 @@ export function CashBookRoot() {
     >
       <Celebration trigger={isBalanced} enabled={celebrationEnabled} />
       <Grid container spacing={2}>
-        <Grid size={3} height="calc(100vh - 73)" overflow="auto">
+        <Grid size={3} height="calc(100vh - 73px)" overflow="auto">
           <Paper
             sx={{
+              position: "sticky",
+              top: 0,
+              backgroundColor: "background.paper",
+              zIndex: 1,
               p: 2,
               m: 2,
               border: "1px solid",
               borderColor: isBalanced ? "success.main" : "divider",
               boxShadow: isBalanced ? "0 0 20px rgba(76, 175, 80, 0.3)" : 1,
               transition: "all 0.3s ease-in-out",
-              ...(isBalanced && {
-                background:
-                  "linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(129, 199, 132, 0.05) 100%)",
-              }),
             }}
           >
             <Box
@@ -100,6 +101,27 @@ export function CashBookRoot() {
                 </Typography>
               </Box>
             )}
+          </Paper>
+          <Paper
+            sx={{
+              p: 2,
+              m: 2,
+              border: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <Typography variant="h6" mb={2}>
+              Recent Activity
+            </Typography>
+
+            <Divider />
+            <Box p={1}>
+              <Typography variant="body1">MANISH</Typography>
+              <Typography variant="body2" color="textSecondary">
+                BEFORE: 30,000 | AFTER: 20,000
+              </Typography>
+            </Box>
+            <Divider />
           </Paper>
         </Grid>
         <Grid size={9} height="calc(100vh - 73px)" overflow="auto">
