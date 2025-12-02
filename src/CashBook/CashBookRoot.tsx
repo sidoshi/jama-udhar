@@ -6,10 +6,8 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { StaticDatePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
 import { CashBook } from "./CashBook";
-import { useAppStore, useEntriesForActiveDate } from "../store";
+import { useEntriesForActiveDate } from "../store";
 import { WarningRounded, CheckCircle, Stars } from "@mui/icons-material";
 import { toLocaleRupeeString } from "../utils";
 import { Celebration } from "../components/Celebration";
@@ -17,8 +15,6 @@ import { useAtom } from "jotai";
 import { celebrationEnabledAtom } from "../store/slices/cashBookSlice";
 
 export function CashBookRoot() {
-  const activeDate = useAppStore((state) => state.activeDate);
-  const setActiveDate = useAppStore((state) => state.setActiveDate);
   const entries = useEntriesForActiveDate();
   const debitTotal = entries.debit.reduce((sum, e) => sum + e.amount, 0);
   const creditTotal = entries.credit.reduce((sum, e) => sum + e.amount, 0);
@@ -47,15 +43,7 @@ export function CashBookRoot() {
     >
       <Celebration trigger={isBalanced} enabled={celebrationEnabled} />
       <Grid container spacing={2}>
-        <Grid size={3}>
-          <StaticDatePicker
-            value={dayjs(activeDate)}
-            onChange={(v) => setActiveDate(dayjs(v))}
-            slots={{
-              actionBar: () => null,
-            }}
-          />
-
+        <Grid size={3} height="calc(100vh - 73)" overflow="auto">
           <Paper
             sx={{
               p: 2,
@@ -114,7 +102,7 @@ export function CashBookRoot() {
             )}
           </Paper>
         </Grid>
-        <Grid size={9} height="calc(100vh - 72px)" overflow="auto">
+        <Grid size={9} height="calc(100vh - 73px)" overflow="auto">
           <CashBook />
         </Grid>
       </Grid>

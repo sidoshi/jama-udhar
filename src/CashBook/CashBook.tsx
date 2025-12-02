@@ -84,7 +84,10 @@ export function CashBook() {
 
   const debitTotal = entries.debit.reduce((sum, e) => sum + e.amount, 0);
   const creditTotal = entries.credit.reduce((sum, e) => sum + e.amount, 0);
-  const entryPairs = zip(entries.credit, entries.debit);
+  const entryPairs = zip(
+    entries.credit.filter((e) => e.amount !== 0),
+    entries.debit.filter((e) => e.amount !== 0)
+  );
 
   return (
     <DndContext
