@@ -5,27 +5,22 @@ import { useState, useRef, useEffect } from "react";
 import { useAppStore } from "../store";
 import { addAccountAtom } from "../store/slices/cashBookSlice";
 import { toLocaleRupeeString } from "../utils";
-
-function parseNumber(value: string): number | null {
-  const numberValue = Number(value.toString().replace(/[₹, ]/g, ""));
-  if (isNaN(numberValue)) {
-    return null;
-  }
-  return numberValue;
-}
+import { evaluate, isValid } from "../math";
 
 export function AddEntryForm() {
   const addEntry = useAppStore((state) => state.addEntry);
   const [account, setAccount] = useAtom(addAccountAtom);
-  const [amount, setAmount] = useState<number | "" | "-">("");
+  const [amount, setAmount] = useState<string>("");
   const accountRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        accountRef.current?.focus();
-      }, 300);
-    });
+    if (accountRef.current && document.activeElement !== accountRef.current) {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          accountRef.current?.focus();
+        }, 0);
+      });
+    }
   }, [account]);
 
   const onAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,41 +29,36 @@ export function AddEntryForm() {
   };
 
   const onAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    if (value.trim() === "-") {
-      setAmount("-");
-      return;
-    }
-
-    const numberValue = parseNumber(value);
-    setAmount(numberValue || "");
+    setAmount(e.target.value);
   };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isValid(amount)) {
+      return;
+    }
     if (account.trim().length < 2) {
       return;
     }
-    if (amount === "" || amount === 0 || amount === "-") {
-      return;
+
+    const numericValue = evaluate(amount);
+    if (numericValue != null) {
+      addEntry({
+        id: `${account.trim()}-${dayjs().unix()}`,
+        account: account.trim(),
+        amount: numericValue,
+        previousAmmount: 0,
+        checked: false,
+      });
+
+      setAccount("");
+      setAmount("");
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          accountRef.current?.focus();
+        }, 0);
+      });
     }
-
-    addEntry({
-      id: `${account.trim()}-${dayjs().unix()}`,
-      account: account.trim(),
-      amount: amount,
-      previousAmmount: 0,
-      checked: false,
-    });
-
-    setAccount("");
-    setAmount("");
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        accountRef.current?.focus();
-      }, 0);
-    });
   };
 
   return (

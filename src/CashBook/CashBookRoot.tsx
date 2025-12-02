@@ -71,8 +71,6 @@ export function CashBookRoot() {
   const { canUndo, canRedo, undo, redo } = useUndoRedo();
   const isBalanced = debitTotal + creditTotal === 0 && creditTotal > 0;
 
-  console.log("Rendering CashBookRoot - isBalanced:", recentActivity);
-
   return (
     <Box
       sx={{
@@ -129,7 +127,7 @@ export function CashBookRoot() {
                 </IconButton>
               </Tooltip>
             </Box>
-            {!isBalanced && debitTotal > 0 && (
+            {!isBalanced && creditTotal > 0 && (
               <Box display="flex" alignItems="center" gap={0.5} mt={1}>
                 <WarningRounded color="warning" />
                 <Typography variant="body2" color="warning.main">
@@ -156,6 +154,8 @@ export function CashBookRoot() {
               m: 2,
               border: "1px solid",
               borderColor: "divider",
+              height: "calc(100% - 160px)",
+              overflowY: "auto",
             }}
           >
             <Box

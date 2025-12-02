@@ -11,6 +11,7 @@ import {
 import type { Entry } from "../store/slices/cashBookSlice";
 import React, { useState } from "react";
 import { useAppStore } from "../store";
+import { evaluate, isValid } from "../math";
 
 export type EntryTransferDialogProps = {
   transfer?: {
@@ -24,8 +25,9 @@ export function EntryTransferDialog({
   transfer,
   onClose,
 }: EntryTransferDialogProps) {
-  const [amount, setAmount] = useState<number | "">("");
+  const [amount, setAmount] = useState<string>("");
   const updateEntry = useAppStore((state) => state.updateEntry);
+  const numericAmount = isValid(amount) ? evaluate(amount) : null;
 
   const handleClose = () => {
     setAmount("");
@@ -33,28 +35,29 @@ export function EntryTransferDialog({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const num = Number(e.target.value);
-    if (!isNaN(num) && num !== 0) {
-      setAmount(num);
-    }
+    setAmount(e.target.value);
   };
 
   const handleSubmit = () => {
     if (amount === "" || transfer == null) {
       return;
     }
+    if (!isValid(amount)) {
+      return;
+    }
+    const numericAmount = evaluate(amount);
 
     const { fromEntry, toEntry } = transfer;
     updateEntry({
       ...fromEntry,
-      amount: fromEntry.amount - amount,
+      amount: fromEntry.amount - numericAmount,
     });
     updateEntry({
       ...toEntry,
-      amount: toEntry.amount + amount,
+      amount: toEntry.amount + numericAmount,
     });
 
-    onClose();
+    handleClose();
   };
 
   return (
@@ -72,14 +75,15 @@ export function EntryTransferDialog({
             onChange={handleChange}
             label="Amount"
           ></TextField>
-          {amount && transfer != null && (
+          {numericAmount && transfer != null && (
             <Box mt={1} display="flex" flexDirection="row" gap={1}>
               <Typography variant="subtitle2" color="textDisabled">
                 {transfer.fromEntry.account}:{" "}
-                {transfer.fromEntry.amount - amount}
+                {transfer.fromEntry.amount - numericAmount}
               </Typography>
               <Typography variant="subtitle2" color="textDisabled">
-                {transfer.toEntry.account}: {transfer.toEntry.amount + amount}
+                {transfer.toEntry.account}:{" "}
+                {transfer.toEntry.amount + numericAmount}
               </Typography>
             </Box>
           )}
