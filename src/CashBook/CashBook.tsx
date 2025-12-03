@@ -25,7 +25,7 @@ import {
 import { useAtom } from "jotai";
 import { PDFLedger } from "./PDFLedger";
 import { EntriesTable } from "./EntriesTable";
-import { AddEntryForm } from "./AddEntryForm";
+import { AddEntryDialog } from "./AddEntryDialog";
 
 export function CashBook() {
   const activeDate = useAppStore((state) => state.activeDate);
@@ -109,7 +109,7 @@ export function CashBook() {
       />
       <Box p={2}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <AddEntryForm />
+          <AddEntryDialog />
           {entries.date != null && entries.date !== activeDate && (
             <Typography variant="subtitle2" color="info.main" gutterBottom>
               Showing entries from {dayjs(entries.date).format("DD MMM YYYY")}

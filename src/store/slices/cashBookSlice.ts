@@ -21,7 +21,7 @@ export const setEditBoxIdAtom = atom(
   }
 );
 
-export const addAccountAtom = atom<string>("");
+export const addAccountAtom = atom<string | null>(null);
 export const celebrationEnabledAtom = atom<boolean>(true);
 
 export type Entry = {
