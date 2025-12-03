@@ -25,39 +25,8 @@ import {
 import { toLocaleRupeeString } from "../utils";
 import { Celebration } from "../components/Celebration";
 import { useAtom } from "jotai";
-import {
-  celebrationEnabledAtom,
-  type ActivityLog,
-} from "../store/slices/cashBookSlice";
-
-function ActivityLogEntry({ log }: { log: ActivityLog }) {
-  return (
-    <>
-      <Divider />
-      <Box p={1}>
-        <Typography variant="body2" color="textSecondary">
-          {log.kind === "add" &&
-            `Added entry ${log.account}, amount: ${toLocaleRupeeString(
-              log.amount
-            )}`}
-
-          {log.kind === "delete" &&
-            `Deleted entry ${log.account}, amount: ${toLocaleRupeeString(
-              log.amount
-            )}`}
-
-          {log.kind === "update" &&
-            `Updated entry ${log.account}, amount: ${toLocaleRupeeString(
-              log.oldAmount
-            )} to ${toLocaleRupeeString(log.newAmount)}`}
-
-          {log.kind === "init" && `Initialized new hisab from ${log.date}`}
-        </Typography>
-      </Box>
-      <Divider />
-    </>
-  );
-}
+import { celebrationEnabledAtom } from "../store/slices/cashBookSlice";
+import { ActivityLogEntry } from "./ActivityLog";
 
 export function CashBookRoot() {
   const entries = useEntriesForActiveDate();
