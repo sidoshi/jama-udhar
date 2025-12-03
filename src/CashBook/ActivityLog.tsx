@@ -4,7 +4,11 @@ import { toLocaleRupeeString } from "../utils";
 
 export function ActivityLogEntry({ log }: { log: ActivityLog }) {
   const getDiffAmount = () => {
-    if (log.kind === "update" && log.oldAmount && log.newAmount) {
+    if (
+      log.kind === "update" &&
+      log.oldAmount != null &&
+      log.newAmount != null
+    ) {
       return log.newAmount - log.oldAmount;
     }
     return 0;
