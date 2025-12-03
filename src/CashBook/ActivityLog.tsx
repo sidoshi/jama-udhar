@@ -17,7 +17,7 @@ export function ActivityLogEntry({ log }: { log: ActivityLog }) {
   const getDiffColor = () => {
     const diff = getDiffAmount();
     if (diff > 0) return "success.main";
-    if (diff < 0) return "error.main";
+    if (diff < 0) return "info.main";
     return "text.secondary";
   };
 
@@ -58,14 +58,10 @@ export function ActivityLogEntry({ log }: { log: ActivityLog }) {
                   width: 8,
                   height: 8,
                   borderRadius: "50%",
-                  bgcolor: "error.main",
+                  bgcolor: "info.main",
                 }}
               />
-              <Typography
-                variant="body2"
-                fontWeight="medium"
-                color="error.main"
-              >
+              <Typography variant="body2" fontWeight="medium" color="info.main">
                 DELETED ENTRY
               </Typography>
             </Box>

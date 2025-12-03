@@ -53,7 +53,7 @@ export function EntriesTable({ title, entries, type }: TableProps) {
                   variant="h6"
                   fontWeight="bold"
                   sx={{
-                    color: type === "debit" ? "error.dark" : "success.dark",
+                    color: type === "debit" ? "info.dark" : "success.dark",
                   }}
                 >
                   Total
@@ -64,7 +64,7 @@ export function EntriesTable({ title, entries, type }: TableProps) {
                   variant="h6"
                   fontWeight="bold"
                   sx={{
-                    color: type === "debit" ? "error.dark" : "success.dark",
+                    color: type === "debit" ? "info.dark" : "success.dark",
                   }}
                 >
                   {toLocaleRupeeString(
