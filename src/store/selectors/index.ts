@@ -63,6 +63,7 @@ export const getCopiedFromMostRecentCashBook = (activeDate: string) => {
       })),
       activityLog: [
         {
+          id: `init-${dayjs().unix()}`,
           timestamp: dayjs().unix().toString(),
           kind: "init" as const,
           date: mostRecentCashBook.date,

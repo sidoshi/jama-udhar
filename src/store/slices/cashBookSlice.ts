@@ -34,18 +34,21 @@ export type Entry = {
 
 export type ActivityLog =
   | {
+      id: string;
       timestamp: string;
       kind: "add";
       account: string;
       amount: number;
     }
   | {
+      id: string;
       timestamp: string;
       kind: "delete";
       account: string;
       amount: number;
     }
   | {
+      id: string;
       timestamp: string;
       kind: "update";
       account: string;
@@ -53,6 +56,7 @@ export type ActivityLog =
       newAmount: number;
     }
   | {
+      id: string;
       timestamp: string;
       kind: "init";
       date: string;
@@ -122,6 +126,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
         cashBook.entries = cashBook.entries.filter((e) => e.id !== entryId);
         cashBook.activityLog = cashBook.activityLog || [];
         cashBook.activityLog.push({
+          id: `${entryToDelete.id}-delete-${dayjs().unix()}`,
           timestamp: dayjs().unix().toString(),
           kind: "delete" as const,
           account: entryToDelete.account,
@@ -145,6 +150,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
             entries: [],
             activityLog: [
               {
+                id: `init-${dayjs().unix()}`,
                 timestamp: dayjs().unix().toString(),
                 kind: "init" as const,
                 date: state.activeDate,
@@ -159,6 +165,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
         cashBook.entries.push(entry);
         cashBook.activityLog = cashBook.activityLog || [];
         cashBook.activityLog.push({
+          id: `${entry.id}-add-${dayjs().unix()}`,
           timestamp: dayjs().unix().toString(),
           kind: "add" as const,
           account: entry.account,
@@ -190,6 +197,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
           cashBook.activityLog = cashBook.activityLog || [];
           if (oldAmount !== entry.amount) {
             cashBook.activityLog.push({
+              id: `${entry.id}-update-${dayjs().unix()}`,
               timestamp: dayjs().unix().toString(),
               kind: "update" as const,
               account: entry.account,
