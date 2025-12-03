@@ -198,10 +198,7 @@ export function CashBookRoot() {
             )}
 
             {recentActivity.map((log) => (
-              <ActivityLogEntry
-                log={log}
-                key={`${log.kind}-${log.timestamp}`}
-              />
+              <ActivityLogEntry log={log} key={log.id} />
             ))}
           </Paper>
         </Grid>

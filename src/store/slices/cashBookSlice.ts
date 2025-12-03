@@ -7,6 +7,8 @@ import { useAppStore } from "..";
 
 export const printPdfAtom = atom<boolean>(false);
 
+export const transferFromAtom = atom<Entry | null>(null);
+
 export const editBoxIdAtom = atom<string | undefined>(undefined);
 export const setEditBoxIdAtom = atom(
   null,

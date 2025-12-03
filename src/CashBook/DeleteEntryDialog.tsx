@@ -40,9 +40,6 @@ export function DeleteEntryDialog({
         <Typography variant="body2" color="textSecondary">
           Amount: {entry.amount}
         </Typography>
-        <Typography variant="body2" color="textSecondary">
-          Type: {entry.type}
-        </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>

@@ -1,7 +1,7 @@
 import { Box, Paper, Grid, Typography, Divider } from "@mui/material";
 import type { Entry } from "../store/slices/cashBookSlice";
 import { toLocaleRupeeString } from "../utils";
-import { DNDRow } from "./DNDRow";
+import { Row } from "./Row";
 
 type TableProps = {
   id: string;
@@ -34,12 +34,12 @@ export function EntriesTable({ title, entries, type }: TableProps) {
         >
           <Grid container>
             <Grid container size={12} px={1}>
-              <Grid size={7}>
+              <Grid size={6}>
                 <Typography variant="subtitle1" fontWeight="bold">
                   {title}
                 </Typography>
               </Grid>
-              <Grid size={5} textAlign="left">
+              <Grid size={6} textAlign="left">
                 <Typography variant="subtitle1" fontWeight="bold">
                   Amount
                 </Typography>
@@ -70,7 +70,7 @@ export function EntriesTable({ title, entries, type }: TableProps) {
             )}
 
             {entries.map((entry) => (
-              <DNDRow key={entry.id} entry={entry} />
+              <Row key={entry.id} entry={entry} />
             ))}
           </Grid>
         </Box>

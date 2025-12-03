@@ -169,6 +169,7 @@ export const CmdK = () => {
           })),
         ],
       },
+
       {
         heading: "Add",
         id: "add",
