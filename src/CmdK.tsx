@@ -1,5 +1,8 @@
-import "react-cmdk/dist/cmdk.css";
-import CommandPalette, { filterItems, getItemIndex } from "react-cmdk";
+import CommandPalette, {
+  filterItems,
+  getItemIndex,
+  type JsonStructureItem,
+} from "react-cmdk";
 import { useEffect, useState } from "react";
 import {
   AddBox,
@@ -25,6 +28,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+
+import "./cmdk.css";
+import { evaluate, isValid } from "./math";
 
 type DeleteActiveCashBookDialogProps = {
   onClose: () => void;
@@ -184,6 +190,20 @@ export const CmdK = () => {
           },
         ],
       },
+
+      {
+        heading: "Calculator",
+        id: "calculator",
+        items: [
+          isValid(search) && {
+            id: "calculator-result",
+            children: `Calculate: ${search} = ${evaluate(search)}`,
+            icon: AddBox,
+            onClick: () => {},
+          },
+        ].filter(Boolean) as JsonStructureItem[],
+      },
+
       {
         heading: "Danger",
         id: "danger",
