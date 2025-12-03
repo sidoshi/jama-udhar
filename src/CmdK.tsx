@@ -180,7 +180,7 @@ export const CmdK = () => {
         heading: "Add",
         id: "add",
         items: [
-          {
+          !isValid(search) && {
             id: "add",
             children: `Add: ${search.toUpperCase()}`,
             icon: AddBox,
@@ -188,7 +188,7 @@ export const CmdK = () => {
               setAddAccount(search.toUpperCase());
             },
           },
-        ],
+        ].filter(Boolean) as JsonStructureItem[],
       },
 
       {
@@ -197,7 +197,9 @@ export const CmdK = () => {
         items: [
           isValid(search) && {
             id: "calculator-result",
-            children: `Calculate: ${search} = ${evaluate(search)}`,
+            children: `Calculate: ${search} = ${toLocaleRupeeString(
+              evaluate(search)
+            )}`,
             icon: AddBox,
             onClick: () => {},
           },

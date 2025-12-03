@@ -8,6 +8,7 @@ import {
   Divider,
   Button,
   ButtonGroup,
+  TextField,
 } from "@mui/material";
 import { CashBook } from "./CashBook";
 import {
@@ -27,6 +28,7 @@ import { Celebration } from "../components/Celebration";
 import { useAtom } from "jotai";
 import { celebrationEnabledAtom } from "../store/slices/cashBookSlice";
 import { ActivityLogEntry } from "./ActivityLog";
+import { useState } from "react";
 
 export function CashBookRoot() {
   const entries = useEntriesForActiveDate();
@@ -39,6 +41,8 @@ export function CashBookRoot() {
 
   const { canUndo, canRedo, undo, redo } = useUndoRedo();
   const isBalanced = debitTotal + creditTotal === 0 && creditTotal > 0;
+
+  const [searchTerm, setSearchTerm] = useState("");
 
   return (
     <Box
@@ -153,6 +157,15 @@ export function CashBookRoot() {
                 </Button>
               </ButtonGroup>
             </Box>
+            <Box mb={1}>
+              <TextField
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                fullWidth
+                label="Search Activity"
+                size="small"
+              />
+            </Box>
 
             {recentActivity.length === 0 && (
               <>
@@ -166,9 +179,15 @@ export function CashBookRoot() {
               </>
             )}
 
-            {recentActivity.map((log) => (
-              <ActivityLogEntry log={log} key={log.id} />
-            ))}
+            {recentActivity
+              .filter(
+                (l) =>
+                  l.kind !== "init" &&
+                  l.account.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .map((log) => (
+                <ActivityLogEntry log={log} key={log.id} />
+              ))}
           </Paper>
         </Grid>
         <Grid size={9} height="calc(100vh - 79px)" overflow="auto">
