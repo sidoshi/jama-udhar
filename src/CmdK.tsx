@@ -146,7 +146,7 @@ export const CmdK = () => {
         items: [
           ...entries.debit.map((e) => ({
             id: `debit-${e.id}-edit`,
-            children: `${e.account} - ${toLocaleRupeeString(e.amount)}`,
+            children: `${e.account} (${toLocaleRupeeString(e.amount)} )`,
             icon: EditNote,
             onClick: () => {
               setEditBoxId(e.id);
@@ -161,7 +161,7 @@ export const CmdK = () => {
         items: [
           ...entries.credit.map((e) => ({
             id: `credit-${e.id}-edit`,
-            children: `${e.account} - ${toLocaleRupeeString(e.amount)}`,
+            children: `${e.account} (${toLocaleRupeeString(e.amount)} )`,
             icon: EditNote,
             onClick: () => {
               setEditBoxId(e.id);
