@@ -59,7 +59,7 @@ export function CashBookRoot() {
     >
       <Celebration trigger={isBalanced} enabled={celebrationEnabled} />
       <Grid container spacing={2}>
-        <Grid size={3} height="calc(100vh - 73px)" overflow="auto">
+        <Grid size={3} height="calc(100vh - 79px)" overflow="auto">
           <Paper
             sx={{
               position: "sticky",
@@ -171,7 +171,7 @@ export function CashBookRoot() {
             ))}
           </Paper>
         </Grid>
-        <Grid size={9} height="calc(100vh - 73px)" overflow="auto">
+        <Grid size={9} height="calc(100vh - 79px)" overflow="auto">
           <CashBook />
         </Grid>
       </Grid>

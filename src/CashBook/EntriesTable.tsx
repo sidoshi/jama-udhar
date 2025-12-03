@@ -46,6 +46,34 @@ export function EntriesTable({ title, entries, type }: TableProps) {
               </Grid>
             </Grid>
 
+            {/* Total Section */}
+            <Grid container size={12} px={1} py={1}>
+              <Grid size={6}>
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  sx={{
+                    color: type === "debit" ? "error.dark" : "success.dark",
+                  }}
+                >
+                  Total
+                </Typography>
+              </Grid>
+              <Grid size={6} textAlign="left">
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  sx={{
+                    color: type === "debit" ? "error.dark" : "success.dark",
+                  }}
+                >
+                  {toLocaleRupeeString(
+                    entries.reduce((sum, e) => sum + e.amount, 0)
+                  )}
+                </Typography>
+              </Grid>
+            </Grid>
+
             <Grid size={12}>
               <Divider sx={{ my: 1 }} />
             </Grid>
@@ -58,6 +86,7 @@ export function EntriesTable({ title, entries, type }: TableProps) {
             flex: 1,
             overflow: "auto",
             px: 2,
+            pb: 2,
           }}
         >
           <Grid container>
@@ -73,27 +102,6 @@ export function EntriesTable({ title, entries, type }: TableProps) {
               <Row key={entry.id} entry={entry} />
             ))}
           </Grid>
-        </Box>
-
-        {/* Sticky Footer */}
-        <Box
-          sx={{
-            position: "sticky",
-            bottom: 0,
-            backgroundColor: "background.paper",
-            p: 2,
-            pt: 1,
-            textAlign: "right",
-            borderTop: 1,
-            color: type === "debit" ? "error.dark" : "success.dark",
-            borderColor: "divider",
-            borderBottom: "1px solid",
-          }}
-        >
-          <Typography variant="h4" fontWeight="bold">
-            Total:{" "}
-            {toLocaleRupeeString(entries.reduce((sum, e) => sum + e.amount, 0))}
-          </Typography>
         </Box>
       </Paper>
     </Box>
