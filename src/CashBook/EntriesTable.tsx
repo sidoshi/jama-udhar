@@ -49,24 +49,12 @@ export function EntriesTable({ title, entries, type }: TableProps) {
             {/* Total Section */}
             <Grid container size={12} px={0} py={1}>
               <Grid size={6}>
-                <Typography
-                  variant="h6"
-                  fontWeight="bold"
-                  sx={{
-                    color: type === "debit" ? "info.dark" : "success.dark",
-                  }}
-                >
+                <Typography variant="h6" fontWeight="bold" sx={{}}>
                   Total
                 </Typography>
               </Grid>
               <Grid size={6} textAlign="left">
-                <Typography
-                  variant="h6"
-                  fontWeight="bold"
-                  sx={{
-                    color: type === "debit" ? "info.dark" : "success.dark",
-                  }}
-                >
+                <Typography variant="h6" fontWeight="bold" sx={{}}>
                   {toLocaleRupeeString(
                     entries.reduce((sum, e) => sum + e.amount, 0),
                   )}

@@ -104,7 +104,6 @@ export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
         minHeight: "40px",
         display: "flex",
         alignItems: "center",
-        color: entry.amount < 0 ? "info.dark" : "success.dark",
         justifyContent: "flex-start",
         cursor: "pointer",
         border: "1px solid transparent",
