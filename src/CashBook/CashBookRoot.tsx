@@ -36,7 +36,7 @@ export function CashBookRoot() {
   const creditTotal = entries.credit.reduce((sum, e) => sum + e.amount, 0);
   const recentActivity = useActivityLogForActiveDate();
   const [celebrationEnabled, setCelebrationEnabled] = useAtom(
-    celebrationEnabledAtom
+    celebrationEnabledAtom,
   );
 
   const { canUndo, canRedo, undo, redo } = useUndoRedo();
@@ -183,7 +183,7 @@ export function CashBookRoot() {
               .filter(
                 (l) =>
                   l.kind !== "init" &&
-                  l.account.toLowerCase().includes(searchTerm.toLowerCase())
+                  l.account.toLowerCase().includes(searchTerm.toLowerCase()),
               )
               .map((log) => (
                 <ActivityLogEntry log={log} key={log.id} />

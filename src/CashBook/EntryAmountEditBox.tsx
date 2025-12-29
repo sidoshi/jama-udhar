@@ -100,7 +100,7 @@ export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
       onClick={onClickEdit}
       sx={{
         width: "100%",
-        padding: "8px 14px",
+        padding: "8px 6px",
         minHeight: "40px",
         display: "flex",
         alignItems: "center",
@@ -124,7 +124,9 @@ export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
       }}
       tabIndex={0}
     >
-      <Typography variant="h6">{toLocaleRupeeString(entry.amount)}</Typography>
+      <Typography variant="h6" fontSize={20}>
+        {toLocaleRupeeString(entry.amount)}
+      </Typography>
     </Box>
   );
 }

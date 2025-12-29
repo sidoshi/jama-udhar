@@ -33,7 +33,7 @@ export function EntriesTable({ title, entries, type }: TableProps) {
           }}
         >
           <Grid container>
-            <Grid container size={12} px={1}>
+            <Grid container size={12} px={0}>
               <Grid size={6}>
                 <Typography variant="subtitle1" fontWeight="bold">
                   {title}
@@ -47,7 +47,7 @@ export function EntriesTable({ title, entries, type }: TableProps) {
             </Grid>
 
             {/* Total Section */}
-            <Grid container size={12} px={1} py={1}>
+            <Grid container size={12} px={0} py={1}>
               <Grid size={6}>
                 <Typography
                   variant="h6"
@@ -68,7 +68,7 @@ export function EntriesTable({ title, entries, type }: TableProps) {
                   }}
                 >
                   {toLocaleRupeeString(
-                    entries.reduce((sum, e) => sum + e.amount, 0)
+                    entries.reduce((sum, e) => sum + e.amount, 0),
                   )}
                 </Typography>
               </Grid>

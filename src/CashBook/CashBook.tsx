@@ -49,7 +49,7 @@ export function CashBook() {
   const creditTotal = entries.credit.reduce((sum, e) => sum + e.amount, 0);
   const entryPairs = zip(
     entries.credit.filter((e) => e.amount !== 0),
-    entries.debit.filter((e) => e.amount !== 0)
+    entries.debit.filter((e) => e.amount !== 0),
   );
 
   return (
@@ -64,7 +64,7 @@ export function CashBook() {
         />
       )}
       <EntryTransferDialog />
-      <Box p={2}>
+      <Box py={2}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <AddEntryDialog />
           {entries.date != null && entries.date !== activeDate && (
