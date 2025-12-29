@@ -34,23 +34,29 @@ export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
     setEditValue(entry.amount.toString());
   }, [entry.amount, setEditBoxId]);
 
-  const onSubmitOrBlur = useCallback(() => {
-    if (!isValid(editValue)) {
-      return;
-    }
+  const onSubmitOrBlur = useCallback(
+    (kind: "submit" | "blur") => {
+      if (!isValid(editValue) && kind === "blur") {
+        return;
+      }
+      if (editValue !== "" && !isValid(editValue) && kind === "submit") {
+        return;
+      }
 
-    const numericValue = evaluate(editValue);
-    if (numericValue != null) {
-      updateEntry({
-        ...entry,
-        amount: numericValue,
-      });
-    }
-    // Use setTimeout to ensure the blur event completes before unmounting
-    setTimeout(() => {
-      closeEditBox();
-    }, 0);
-  }, [editValue, entry, updateEntry, closeEditBox]);
+      const numericValue = editValue === "" ? 0 : evaluate(editValue);
+      if (numericValue != null) {
+        updateEntry({
+          ...entry,
+          amount: numericValue,
+        });
+      }
+      // Use setTimeout to ensure the blur event completes before unmounting
+      setTimeout(() => {
+        closeEditBox();
+      }, 0);
+    },
+    [editValue, entry, updateEntry, closeEditBox],
+  );
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditValue(e.target.value);
@@ -79,10 +85,10 @@ export function EntryAmountEditBox({ entry }: EntryAmountEditBoxProps) {
       fullWidth
       inputRef={inputRef}
       onChange={onChange}
-      onBlur={onSubmitOrBlur}
+      onBlur={() => onSubmitOrBlur("blur")}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          onSubmitOrBlur();
+          onSubmitOrBlur("submit");
         }
         if (e.key === "Escape") {
           closeEditBox();
