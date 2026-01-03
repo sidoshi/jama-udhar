@@ -31,12 +31,71 @@ function findMostRecentDateBefore(activeDate: string, dates: string[]) {
 
 export const getEntriesForCashBook = (cashBook?: CashBook) => {
   const entries = cashBook ? cashBook.entries : [];
-  const debitEntries = entries.filter((e) => e.amount < 0);
-  const creditEntries = entries.filter((e) => e.amount >= 0);
+
+  const entriesAtEnd = [/sp ang/i, /hm ang/i, /rok/i, /commission/i];
+
+  const debitEntries = entries
+    .filter((e) => e.amount < 0)
+    .reverse()
+    .sort((a, b) => {
+      // modify the sort so that entries matching entriesAtEnd come last
+      // but since commission is at the very end, it should come last among them
+
+      const aEnds = entriesAtEnd.some((regex) => regex.test(a.account));
+      const bEnds = entriesAtEnd.some((regex) => regex.test(b.account));
+
+      if (aEnds && !bEnds) {
+        return 1;
+      } else if (!aEnds && bEnds) {
+        return -1;
+      } else if (aEnds && bEnds) {
+        // both end, so check for commission
+        const aIsCommission = /commission/i.test(a.account);
+        const bIsCommission = /commission/i.test(b.account);
+        if (aIsCommission && !bIsCommission) {
+          return 1;
+        } else if (!aIsCommission && bIsCommission) {
+          return -1;
+        } else {
+          return 0;
+        }
+      } else {
+        return 0;
+      }
+    });
+  const creditEntries = entries
+    .filter((e) => e.amount >= 0)
+    .reverse()
+    .sort((a, b) => {
+      // modify the sort so that entries matching entriesAtEnd come last
+      // but since commission is at the very end, it should come last among them
+
+      const aEnds = entriesAtEnd.some((regex) => regex.test(a.account));
+      const bEnds = entriesAtEnd.some((regex) => regex.test(b.account));
+
+      if (aEnds && !bEnds) {
+        return 1;
+      } else if (!aEnds && bEnds) {
+        return -1;
+      } else if (aEnds && bEnds) {
+        // both end, so check for commission
+        const aIsCommission = /commission/i.test(a.account);
+        const bIsCommission = /commission/i.test(b.account);
+        if (aIsCommission && !bIsCommission) {
+          return 1;
+        } else if (!aIsCommission && bIsCommission) {
+          return -1;
+        } else {
+          return 0;
+        }
+      } else {
+        return 0;
+      }
+    });
 
   return {
-    debit: debitEntries.reverse(),
-    credit: creditEntries.reverse(),
+    debit: debitEntries,
+    credit: creditEntries,
     date: cashBook?.date,
   };
 };
