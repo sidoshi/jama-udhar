@@ -35,7 +35,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
           style={{
             border: "1px solid #ddd",
             padding: "14px 10px",
-            textAlign: "left",
+            textAlign: "right",
             fontWeight: "bold",
             width: "25%",
             color: "#000",
@@ -47,7 +47,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
           style={{
             border: "1px solid #ddd",
             padding: "14px 10px",
-            textAlign: "right",
+            textAlign: "left",
             fontWeight: "bold",
             width: "25%",
             color: "#000",
@@ -59,7 +59,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
           style={{
             border: "1px solid #ddd",
             padding: "14px 10px",
-            textAlign: "left",
+            textAlign: "right",
             fontWeight: "bold",
             width: "25%",
             color: "#000",
@@ -71,7 +71,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
           style={{
             border: "1px solid #ddd",
             padding: "14px 10px",
-            textAlign: "right",
+            textAlign: "left",
             fontWeight: "bold",
             width: "25%",
             color: "#000",
@@ -97,6 +97,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
               border: "1px solid #ddd",
               padding: "8px 9px",
               color: "#000",
+              textAlign: "right",
             }}
           >
             {creditAccount?.account || ""}
@@ -105,12 +106,12 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
             style={{
               border: "1px solid #ddd",
               padding: "8px 9px",
-              textAlign: "right",
+              textAlign: "left",
               color: "#000",
             }}
           >
             {creditAccount
-              ? `+ ${toLocaleRupeeString(creditAccount.amount)}`
+              ? `${toLocaleRupeeString(creditAccount.amount)}`
               : ""}
           </td>
           <td
@@ -118,6 +119,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
               border: "1px solid #ddd",
               padding: "8px 9px",
               color: "#000",
+              textAlign: "right",
             }}
           >
             {debitAccount?.account || ""}
@@ -126,7 +128,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
             style={{
               border: "1px solid #ddd",
               padding: "8px 9px",
-              textAlign: "right",
+              textAlign: "left",
               color: "#000",
             }}
           >
@@ -162,6 +164,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
               padding: "14px 10px",
               fontWeight: "bold",
               color: "#000",
+              textAlign: "right",
             }}
           >
             Total
@@ -170,12 +173,12 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
             style={{
               border: "1px solid #ddd",
               padding: "14px 10px",
-              textAlign: "right",
+              textAlign: "left",
               color: "#000",
               fontWeight: "bold",
             }}
           >
-            + {toLocaleRupeeString(creditTotal)}
+            {toLocaleRupeeString(creditTotal)}
           </td>
           <td
             style={{
@@ -183,6 +186,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
               padding: "14px 10px",
               fontWeight: "bold",
               color: "#000",
+              textAlign: "right",
             }}
           >
             Total
@@ -191,7 +195,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
             style={{
               border: "1px solid #ddd",
               padding: "14px 10px",
-              textAlign: "right",
+              textAlign: "left",
               color: "#000",
               fontWeight: "bold",
             }}
@@ -262,7 +266,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
                     fontWeight: "bold",
                   }}
                 >
-                  Balance: {balance >= 0 ? "+ " : "- "}
+                  Balance: {balance >= 0 ? "" : "- "}
                   {toLocaleRupeeString(Math.abs(balance))}
                 </p>
                 <p
