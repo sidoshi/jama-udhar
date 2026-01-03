@@ -44,7 +44,7 @@ export function CashBook() {
           title: JSON.stringify(hidden),
         });
 
-        window.open(pdf.output("bloburl"), "_blank");
+        pdf.save(`CashBook-${dayjs(activeDate).format("DD-MM-YYYY")}.pdf`);
       }
 
       setIsPrinting(false);
