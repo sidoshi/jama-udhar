@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import type { Entry } from "../store/slices/cashBookSlice";
 import { toLocaleRupeeString } from "../utils";
 import type { FC, RefObject } from "react";
+import { useAppStore } from "../store";
 
 type PDFLedgerProps = {
   balance: number;
@@ -18,8 +19,9 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
   creditTotal,
   targetRef,
 }) => {
+  const activeDate = useAppStore((state) => state.activeDate);
   // Split entries into chunks that fit on a page (approximately 25-30 entries per page)
-  const entries_PER_PAGE = 15;
+  const entries_PER_PAGE = 20;
   const pageChunks: Array<typeof entries> = [];
 
   for (let i = 0; i < entries.length; i += entries_PER_PAGE) {
@@ -93,7 +95,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
           <td
             style={{
               border: "1px solid #ddd",
-              padding: "12px 10px",
+              padding: "8px 9px",
               color: "#000",
             }}
           >
@@ -102,7 +104,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
           <td
             style={{
               border: "1px solid #ddd",
-              padding: "12px 10px",
+              padding: "8px 9px",
               textAlign: "right",
               color: "#000",
             }}
@@ -114,7 +116,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
           <td
             style={{
               border: "1px solid #ddd",
-              padding: "12px 10px",
+              padding: "8px 9px",
               color: "#000",
             }}
           >
@@ -123,7 +125,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
           <td
             style={{
               border: "1px solid #ddd",
-              padding: "12px 10px",
+              padding: "8px 9px",
               textAlign: "right",
               color: "#000",
             }}
@@ -218,7 +220,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
         <div
           style={{
             fontFamily: "Arial, sans-serif",
-            maxWidth: "800px",
+            maxWidth: "700px",
             margin: "0 auto",
             backgroundColor: "#fff",
             color: "#000",
@@ -270,7 +272,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
                     color: "#333",
                   }}
                 >
-                  Generated on ({dayjs().format("YYYY-MM-DD")})
+                  Generated on ({dayjs(activeDate).format("YYYY-MM-DD")})
                 </p>
               </div>
 
@@ -278,7 +280,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
                 style={{
                   width: "100%",
                   borderCollapse: "collapse",
-                  fontSize: "16px",
+                  fontSize: "14px",
                 }}
               >
                 {renderTableHeader()}

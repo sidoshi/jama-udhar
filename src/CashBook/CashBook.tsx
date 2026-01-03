@@ -25,6 +25,15 @@ export function CashBook() {
         const pdf = await generatePDF(printTargetRef, {
           method: "build",
         });
+
+        const totalPages = pdf.getNumberOfPages();
+        console.log("tota", totalPages);
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          pdf.setFontSize(10);
+          pdf.text(`Page ${i} of ${totalPages}`, 5, 5);
+        }
+
         const hidden: CashBook = {
           id: activeDate,
           date: activeDate,
@@ -34,7 +43,8 @@ export function CashBook() {
         pdf.setProperties({
           title: JSON.stringify(hidden),
         });
-        pdf.save(`Accounting_Sheet_${activeDate}.pdf`);
+
+        window.open(pdf.output("bloburl"), "_blank");
       }
 
       setIsPrinting(false);
@@ -49,7 +59,7 @@ export function CashBook() {
   const creditTotal = entries.credit.reduce((sum, e) => sum + e.amount, 0);
   const entryPairs = zip(
     entries.credit.filter((e) => e.amount !== 0),
-    entries.debit.filter((e) => e.amount !== 0),
+    entries.debit.filter((e) => e.amount !== 0)
   );
 
   return (
