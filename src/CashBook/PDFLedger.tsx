@@ -20,7 +20,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
 }) => {
   const activeDate = useAppStore((state) => state.activeDate);
   // Split entries into chunks that fit on a page (approximately 25-30 entries per page)
-  const entries_PER_PAGE = 24;
+  const entries_PER_PAGE = 20;
   const entriesWithTotal = [
     ...entries,
     [

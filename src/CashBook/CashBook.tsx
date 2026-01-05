@@ -57,10 +57,10 @@ export function CashBook() {
           title: JSON.stringify(hidden),
         });
 
-        pdf.save(`CashBook-${dayjs(activeDate).format("DD-MM-YYYY")}.pdf`);
-        // const blob = pdf.output("blob");
-        // const url = URL.createObjectURL(blob);
-        // window.open(url, "_blank");
+        // pdf.save(`CashBook-${dayjs(activeDate).format("DD-MM-YYYY")}.pdf`);
+        const blob = pdf.output("blob");
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank");
       }
 
       setIsPrinting(false);
