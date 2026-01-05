@@ -24,6 +24,19 @@ export function CashBook() {
       if (printTargetRef.current) {
         const pdf = await generatePDF(printTargetRef, {
           method: "build",
+          resolution: 2,
+          page: {
+            margin: 8,
+          },
+          canvas: {
+            mimeType: "image/png",
+            qualityRatio: 1,
+          },
+          overrides: {
+            pdf: {
+              compress: true,
+            },
+          },
         });
 
         const totalPages = pdf.getNumberOfPages();
@@ -31,7 +44,7 @@ export function CashBook() {
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
           pdf.setFontSize(10);
-          pdf.text(`Page ${i} of ${totalPages}`, 5, 5);
+          pdf.text(`Page ${i} of ${totalPages}`, 18, 12);
         }
 
         const hidden: CashBook = {
@@ -45,13 +58,16 @@ export function CashBook() {
         });
 
         pdf.save(`CashBook-${dayjs(activeDate).format("DD-MM-YYYY")}.pdf`);
+        // const blob = pdf.output("blob");
+        // const url = URL.createObjectURL(blob);
+        // window.open(url, "_blank");
       }
 
       setIsPrinting(false);
     }
 
     if (isPrinting) {
-      printPDF();
+      printPDF().catch(console.log);
     }
   }, [isPrinting, printTargetRef, activeDate, entries, setIsPrinting]);
 
@@ -59,7 +75,7 @@ export function CashBook() {
   const creditTotal = entries.credit.reduce((sum, e) => sum + e.amount, 0);
   const entryPairs = zip(
     entries.credit.filter((e) => e.amount !== 0),
-    entries.debit.filter((e) => e.amount !== 0)
+    entries.debit.filter((e) => e.amount !== 0),
   );
 
   return (

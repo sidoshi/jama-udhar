@@ -13,7 +13,6 @@ type PDFLedgerProps = {
 };
 
 export const PDFLedger: FC<PDFLedgerProps> = ({
-  balance,
   entries,
   debitTotal,
   creditTotal,
@@ -21,11 +20,18 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
 }) => {
   const activeDate = useAppStore((state) => state.activeDate);
   // Split entries into chunks that fit on a page (approximately 25-30 entries per page)
-  const entries_PER_PAGE = 20;
+  const entries_PER_PAGE = 24;
+  const entriesWithTotal = [
+    ...entries,
+    [
+      { id: "creditTotal", account: "Total", amount: creditTotal } as Entry,
+      { id: "debitTotal", account: "Total", amount: debitTotal } as Entry,
+    ] as [Entry, Entry],
+  ];
   const pageChunks: Array<typeof entries> = [];
 
-  for (let i = 0; i < entries.length; i += entries_PER_PAGE) {
-    pageChunks.push(entries.slice(i, i + entries_PER_PAGE));
+  for (let i = 0; i < entriesWithTotal.length; i += entries_PER_PAGE) {
+    pageChunks.push(entriesWithTotal.slice(i, i + entries_PER_PAGE));
   }
 
   const renderTableHeader = () => (
@@ -141,91 +147,21 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
     </tbody>
   );
 
-  const renderTotalsTable = () => (
-    <table
-      style={{
-        width: "100%",
-        borderCollapse: "collapse",
-        fontSize: "16px",
-      }}
-    >
-      {renderTableHeader()}
-      <tbody>
-        <tr
-          style={{
-            backgroundColor: "#f0f0f0",
-            fontWeight: "bold",
-            borderTop: "2px solid #333",
-          }}
-        >
-          <td
-            style={{
-              border: "1px solid #ddd",
-              padding: "14px 10px",
-              fontWeight: "bold",
-              color: "#000",
-              textAlign: "right",
-            }}
-          >
-            Total
-          </td>
-          <td
-            style={{
-              border: "1px solid #ddd",
-              padding: "14px 10px",
-              textAlign: "left",
-              color: "#000",
-              fontWeight: "bold",
-            }}
-          >
-            {toLocaleRupeeString(creditTotal)}
-          </td>
-          <td
-            style={{
-              border: "1px solid #ddd",
-              padding: "14px 10px",
-              fontWeight: "bold",
-              color: "#000",
-              textAlign: "right",
-            }}
-          >
-            Total
-          </td>
-          <td
-            style={{
-              border: "1px solid #ddd",
-              padding: "14px 10px",
-              textAlign: "left",
-              color: "#000",
-              fontWeight: "bold",
-            }}
-          >
-            - {toLocaleRupeeString(Math.abs(debitTotal))}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  );
-
   return (
     <div
       style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "210mm", // A4 width
-        minHeight: "297mm", // A4 height
-        zIndex: -9999,
-        opacity: 0, // Invisible but still rendered
-        pointerEvents: "none", // Doesn't interfere with clicks
+        position: "absolute",
+        top: "-9999px",
+        left: "-9999px",
+        width: "210mm",
+        backgroundColor: "#fff",
       }}
     >
-      <div className="pdf-container" ref={targetRef}>
+      <div ref={targetRef}>
         <div
           style={{
             fontFamily: "Arial, sans-serif",
-            maxWidth: "700px",
-            margin: "0 auto",
+            width: "100%",
             backgroundColor: "#fff",
             color: "#000",
           }}
@@ -235,40 +171,17 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
               key={pageIndex}
               style={{
                 padding: "20px",
-                height: "297mm",
-                pageBreakBefore: pageIndex > 0 ? "always" : "auto",
+                minHeight: "297mm",
               }}
             >
-              {/* Repeat header on subsequent pages */}
               <div
-                className="no-page-break"
                 style={{
                   textAlign: "center",
-                  marginBottom: "30px",
+                  marginBottom: "10px",
                   borderBottom: "2px solid #333",
-                  paddingBottom: "15px",
+                  paddingBottom: "10px",
                 }}
               >
-                <h1
-                  style={{
-                    margin: "0 0 10px 0",
-                    fontSize: "32px",
-                    color: "#000",
-                  }}
-                >
-                  Ledger
-                </h1>
-                <p
-                  style={{
-                    margin: "0",
-                    fontSize: "20px",
-                    color: "#000",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Balance: {balance >= 0 ? "" : "- "}
-                  {toLocaleRupeeString(Math.abs(balance))}
-                </p>
                 <p
                   style={{
                     margin: "5px 0 0 0",
@@ -276,7 +189,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
                     color: "#333",
                   }}
                 >
-                  Generated on ({dayjs(activeDate).format("YYYY-MM-DD")})
+                  ({dayjs(activeDate).format("YYYY-MM-DD")})
                 </p>
               </div>
 
@@ -284,7 +197,7 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
                 style={{
                   width: "100%",
                   borderCollapse: "collapse",
-                  fontSize: "14px",
+                  fontSize: "16px",
                 }}
               >
                 {renderTableHeader()}
@@ -292,9 +205,6 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
               </table>
             </div>
           ))}
-
-          {/* Totals table on the last page */}
-          <div style={{ padding: "20px" }}>{renderTotalsTable()}</div>
         </div>
       </div>
     </div>
