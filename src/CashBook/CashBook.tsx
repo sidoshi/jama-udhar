@@ -1,94 +1,89 @@
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 import { Typography, Box } from "@mui/material";
 import { zip } from "lodash-es";
-import generatePDF from "react-to-pdf";
 import { useAppStore, useEntriesForActiveDate } from "../store";
 import dayjs from "dayjs";
-import { printPdfAtom, type CashBook } from "../store/slices/cashBookSlice";
+import {
+  printPdfAtom,
+  type CashBook,
+  type Entry,
+} from "../store/slices/cashBookSlice";
 
 import { EntryTransferDialog } from "./EntryTransferDialog";
 import { useAtom } from "jotai";
 import { PDFLedger } from "./PDFLedger";
 import { EntriesTable } from "./EntriesTable";
 import { AddEntryDialog } from "./AddEntryDialog";
+import { pdf } from "@react-pdf/renderer";
+
+const generatePDFLedger = async (
+  entries: Array<[Entry | undefined, Entry | undefined]>,
+  debitTotal: number,
+  creditTotal: number,
+  activeDate: string
+) => {
+  const pdfDoc = (
+    <PDFLedger
+      entries={entries}
+      debitTotal={debitTotal}
+      creditTotal={creditTotal}
+      activeDate={activeDate}
+    />
+  );
+
+  const blob = await pdf(pdfDoc).toBlob();
+  const url = URL.createObjectURL(blob);
+
+  // Create a temporary link to download the PDF
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `CashBook-${dayjs(activeDate).format("DD-MM-YYYY")}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  // Clean up the URL
+  URL.revokeObjectURL(url);
+
+  return blob;
+};
 
 export function CashBook() {
   const activeDate = useAppStore((state) => state.activeDate);
   const entries = useEntriesForActiveDate();
 
   const [isPrinting, setIsPrinting] = useAtom(printPdfAtom);
-  const printTargetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function printPDF() {
-      if (printTargetRef.current) {
-        const pdf = await generatePDF(printTargetRef, {
-          method: "build",
-          resolution: 2,
-          page: {
-            margin: 8,
-          },
-          canvas: {
-            mimeType: "image/png",
-            qualityRatio: 1,
-          },
-          overrides: {
-            pdf: {
-              compress: true,
-            },
-          },
-        });
+      const debitTotal = entries.debit.reduce((sum, e) => sum + e.amount, 0);
+      const creditTotal = entries.credit.reduce((sum, e) => sum + e.amount, 0);
+      const entryPairs = zip(
+        entries.credit.filter((e) => e.amount !== 0),
+        entries.debit.filter((e) => e.amount !== 0)
+      );
 
-        const totalPages = pdf.getNumberOfPages();
-        console.log("tota", totalPages);
-        for (let i = 1; i <= totalPages; i++) {
-          pdf.setPage(i);
-          pdf.setFontSize(10);
-          pdf.text(`Page ${i} of ${totalPages}`, 18, 12);
-        }
-
-        const hidden: CashBook = {
-          id: activeDate,
-          date: activeDate,
-          entries: [...entries.debit, ...entries.credit],
-          activityLog: [],
-        };
-        pdf.setProperties({
-          title: JSON.stringify(hidden),
-        });
-
-        pdf.save(`CashBook-${dayjs(activeDate).format("DD-MM-YYYY")}.pdf`);
-        // const blob = pdf.output("blob");
-        // const url = URL.createObjectURL(blob);
-        // window.open(url, "_blank");
+      try {
+        await generatePDFLedger(
+          entryPairs,
+          debitTotal,
+          creditTotal,
+          activeDate
+        );
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+      } finally {
+        setIsPrinting(false);
       }
-
-      setIsPrinting(false);
     }
 
     if (isPrinting) {
-      printPDF().catch(console.log);
+      printPDF();
     }
-  }, [isPrinting, printTargetRef, activeDate, entries, setIsPrinting]);
-
-  const debitTotal = entries.debit.reduce((sum, e) => sum + e.amount, 0);
-  const creditTotal = entries.credit.reduce((sum, e) => sum + e.amount, 0);
-  const entryPairs = zip(
-    entries.credit.filter((e) => e.amount !== 0),
-    entries.debit.filter((e) => e.amount !== 0),
-  );
+  }, [isPrinting, activeDate, entries, setIsPrinting]);
 
   return (
     <Box>
-      {isPrinting && (
-        <PDFLedger
-          balance={debitTotal + creditTotal}
-          entries={entryPairs}
-          debitTotal={debitTotal}
-          creditTotal={creditTotal}
-          targetRef={printTargetRef}
-        />
-      )}
       <EntryTransferDialog />
       <Box py={2}>
         <Box display="flex" justifyContent="space-between" alignItems="center">

@@ -11,4 +11,25 @@ export default defineConfig({
       },
     }),
   ],
+  optimizeDeps: {
+    include: ["@react-pdf/renderer", "base64-js"],
+    esbuildOptions: {
+      target: "esnext",
+    },
+  },
+  define: {
+    global: "globalThis",
+  },
+  build: {
+    rollupOptions: {
+      external: [],
+      output: {
+        format: "es",
+      },
+    },
+    commonjsOptions: {
+      include: [/base64-js/, /node_modules/],
+      transformMixedEsModules: true,
+    },
+  },
 });

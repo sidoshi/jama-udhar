@@ -1,26 +1,117 @@
+import React from "react";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import dayjs from "dayjs";
 import type { Entry } from "../store/slices/cashBookSlice";
-import { toLocaleRupeeString } from "../utils";
-import type { FC, RefObject } from "react";
-import { useAppStore } from "../store";
+
+// Simple rupee formatter for PDF (avoids unicode issues)
+const formatRupees = (amount: number) => {
+  if (amount == null || isNaN(amount)) {
+    return "0";
+  }
+
+  const absAmount = Math.abs(amount).toLocaleString("en-IN", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+
+  return absAmount;
+};
+
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: "column",
+    backgroundColor: "#ffffff",
+    padding: 30,
+    fontSize: 12,
+    fontFamily: "Helvetica",
+  },
+  header: {
+    textAlign: "center",
+    marginBottom: 20,
+    paddingBottom: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: "#333333",
+  },
+  dateText: {
+    fontSize: 14,
+    color: "#333333",
+    fontWeight: "bold",
+  },
+  table: {
+    width: "100%",
+    marginBottom: 40,
+    borderWidth: 0.5,
+    borderColor: "#cccccc",
+  },
+  tableRow: {
+    flexDirection: "row",
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#cccccc",
+    borderTopWidth: 0.5,
+    borderTopColor: "#cccccc",
+  },
+  tableRowEven: {
+    backgroundColor: "#f9f9f9",
+  },
+  tableColHeader: {
+    width: "25%",
+    backgroundColor: "#f5f5f5",
+    padding: 10,
+    borderRightWidth: 0.5,
+    borderRightColor: "#cccccc",
+  },
+  tableCol: {
+    width: "25%",
+    padding: 8,
+    borderRightWidth: 0.5,
+    borderRightColor: "#cccccc",
+  },
+  tableColLast: {
+    width: "25%",
+    padding: 8,
+  },
+  tableCellHeader: {
+    fontSize: 11,
+    fontWeight: "bold",
+    color: "#000000",
+    fontFamily: "Helvetica-Bold",
+  },
+  tableCell: {
+    fontSize: 10,
+    color: "#000000",
+    fontFamily: "Helvetica",
+  },
+  tableCellRight: {
+    textAlign: "right",
+  },
+  tableCellLeft: {
+    textAlign: "left",
+  },
+  footer: {
+    position: "absolute",
+    bottom: 15,
+    left: 0,
+    right: 0,
+    textAlign: "center",
+    fontSize: 10,
+    color: "#666666",
+  },
+});
 
 type PDFLedgerProps = {
-  balance: number;
   entries: Array<[Entry | undefined, Entry | undefined]>;
   debitTotal: number;
   creditTotal: number;
-  targetRef: RefObject<HTMLDivElement | null>;
+  activeDate: string;
 };
 
-export const PDFLedger: FC<PDFLedgerProps> = ({
+export const PDFLedger: React.FC<PDFLedgerProps> = ({
   entries,
   debitTotal,
   creditTotal,
-  targetRef,
+  activeDate,
 }) => {
-  const activeDate = useAppStore((state) => state.activeDate);
-  // Split entries into chunks that fit on a page (approximately 25-30 entries per page)
-  const entries_PER_PAGE = 20;
+  // Add total row to entries
   const entriesWithTotal = [
     ...entries,
     [
@@ -28,185 +119,88 @@ export const PDFLedger: FC<PDFLedgerProps> = ({
       { id: "debitTotal", account: "Total", amount: debitTotal } as Entry,
     ] as [Entry, Entry],
   ];
-  const pageChunks: Array<typeof entries> = [];
-
-  for (let i = 0; i < entriesWithTotal.length; i += entries_PER_PAGE) {
-    pageChunks.push(entriesWithTotal.slice(i, i + entries_PER_PAGE));
-  }
-
-  const renderTableHeader = () => (
-    <thead>
-      <tr style={{ backgroundColor: "#f5f5f5" }}>
-        <th
-          style={{
-            border: "1px solid #ddd",
-            padding: "14px 10px",
-            textAlign: "right",
-            fontWeight: "bold",
-            width: "25%",
-            color: "#000",
-          }}
-        >
-          Account
-        </th>
-        <th
-          style={{
-            border: "1px solid #ddd",
-            padding: "14px 10px",
-            textAlign: "left",
-            fontWeight: "bold",
-            width: "25%",
-            color: "#000",
-          }}
-        >
-          Credit + જમા
-        </th>
-        <th
-          style={{
-            border: "1px solid #ddd",
-            padding: "14px 10px",
-            textAlign: "right",
-            fontWeight: "bold",
-            width: "25%",
-            color: "#000",
-          }}
-        >
-          Account
-        </th>
-        <th
-          style={{
-            border: "1px solid #ddd",
-            padding: "14px 10px",
-            textAlign: "left",
-            fontWeight: "bold",
-            width: "25%",
-            color: "#000",
-          }}
-        >
-          Debit - ઉધાર
-        </th>
-      </tr>
-    </thead>
-  );
-
-  const renderTableentries = (pageentries: typeof entries) => (
-    <tbody>
-      {pageentries.map(([creditAccount, debitAccount], index) => (
-        <tr
-          key={index}
-          style={{
-            backgroundColor: index % 2 === 0 ? "#fff" : "#f9f9f9",
-          }}
-        >
-          <td
-            style={{
-              border: "1px solid #ddd",
-              padding: "8px 9px",
-              color: "#000",
-              textAlign: "right",
-            }}
-          >
-            {creditAccount?.account || ""}
-          </td>
-          <td
-            style={{
-              border: "1px solid #ddd",
-              padding: "8px 9px",
-              textAlign: "left",
-              color: "#000",
-            }}
-          >
-            {creditAccount
-              ? `${toLocaleRupeeString(creditAccount.amount)}`
-              : ""}
-          </td>
-          <td
-            style={{
-              border: "1px solid #ddd",
-              padding: "8px 9px",
-              color: "#000",
-              textAlign: "right",
-            }}
-          >
-            {debitAccount?.account || ""}
-          </td>
-          <td
-            style={{
-              border: "1px solid #ddd",
-              padding: "8px 9px",
-              textAlign: "left",
-              color: "#000",
-            }}
-          >
-            {debitAccount
-              ? `- ${toLocaleRupeeString(Math.abs(debitAccount.amount))}`
-              : ""}
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  );
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: "-9999px",
-        left: "-9999px",
-        width: "210mm",
-        backgroundColor: "#fff",
-      }}
-    >
-      <div ref={targetRef}>
-        <div
-          style={{
-            fontFamily: "Arial, sans-serif",
-            width: "100%",
-            backgroundColor: "#fff",
-            color: "#000",
-          }}
-        >
-          {pageChunks.map((pageentries, pageIndex) => (
-            <div
-              key={pageIndex}
-              style={{
-                padding: "20px",
-                minHeight: "297mm",
-              }}
-            >
-              <div
-                style={{
-                  textAlign: "center",
-                  marginBottom: "10px",
-                  borderBottom: "2px solid #333",
-                  paddingBottom: "10px",
-                }}
-              >
-                <p
-                  style={{
-                    margin: "5px 0 0 0",
-                    fontSize: "14px",
-                    color: "#333",
-                  }}
-                >
-                  ({dayjs(activeDate).format("YYYY-MM-DD")})
-                </p>
-              </div>
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.dateText}>
+            ({dayjs(activeDate).format("YYYY-MM-DD")})
+          </Text>
+        </View>
 
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  fontSize: "16px",
-                }}
-              >
-                {renderTableHeader()}
-                {renderTableentries(pageentries)}
-              </table>
-            </div>
+        {/* Table */}
+        <View style={styles.table}>
+          {/* Table Header */}
+          <View style={styles.tableRow}>
+            <View style={styles.tableColHeader}>
+              <Text style={[styles.tableCellHeader, styles.tableCellRight]}>
+                Account
+              </Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={[styles.tableCellHeader, styles.tableCellLeft]}>
+                Credit + Jama
+              </Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={[styles.tableCellHeader, styles.tableCellRight]}>
+                Account
+              </Text>
+            </View>
+            <View style={[styles.tableColHeader, { borderRightWidth: 0 }]}>
+              <Text style={[styles.tableCellHeader, styles.tableCellLeft]}>
+                Debit - Udhar
+              </Text>
+            </View>
+          </View>
+
+          {/* Table Body */}
+          {entriesWithTotal.map(([creditAccount, debitAccount], index) => (
+            <View
+              key={index}
+              style={[
+                styles.tableRow,
+                ...(index % 2 === 1 ? [styles.tableRowEven] : []),
+              ]}
+              wrap={false} // Prevent breaking rows across pages
+            >
+              <View style={styles.tableCol}>
+                <Text style={[styles.tableCell, styles.tableCellRight]}>
+                  {creditAccount?.account || ""}
+                </Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={[styles.tableCell, styles.tableCellLeft]}>
+                  {creditAccount ? formatRupees(creditAccount.amount) : ""}
+                </Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={[styles.tableCell, styles.tableCellRight]}>
+                  {debitAccount?.account || ""}
+                </Text>
+              </View>
+              <View style={[styles.tableCol, { borderRightWidth: 0 }]}>
+                <Text style={[styles.tableCell, styles.tableCellLeft]}>
+                  {debitAccount
+                    ? `- ${formatRupees(Math.abs(debitAccount.amount))}`
+                    : ""}
+                </Text>
+              </View>
+            </View>
           ))}
-        </div>
-      </div>
-    </div>
+        </View>
+
+        {/* Footer with page numbers */}
+        <Text
+          style={styles.footer}
+          render={({ pageNumber, totalPages }) =>
+            `Page ${pageNumber} of ${totalPages}`
+          }
+          fixed
+        />
+      </Page>
+    </Document>
   );
 };
