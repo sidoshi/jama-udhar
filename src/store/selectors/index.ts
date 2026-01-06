@@ -36,7 +36,17 @@ export const getEntriesForCashBook = (cashBook?: CashBook) => {
 
   const debitEntries = entries
     .filter((e) => e.amount < 0)
-    .reverse()
+    .sort((a, b) => {
+      if (a.updatedAt && b.updatedAt) {
+        return dayjs(b.updatedAt).diff(dayjs(a.updatedAt));
+      } else if (a.updatedAt) {
+        return -1;
+      } else if (b.updatedAt) {
+        return 1;
+      } else {
+        return 0;
+      }
+    })
     .sort((a, b) => {
       // modify the sort so that entries matching entriesAtEnd come last
       // but since commission is at the very end, it should come last among them
@@ -48,24 +58,24 @@ export const getEntriesForCashBook = (cashBook?: CashBook) => {
         return 1;
       } else if (!aEnds && bEnds) {
         return -1;
-      } else if (aEnds && bEnds) {
-        // both end, so check for commission
-        const aIsCommission = /commission/i.test(a.account);
-        const bIsCommission = /commission/i.test(b.account);
-        if (aIsCommission && !bIsCommission) {
-          return 1;
-        } else if (!aIsCommission && bIsCommission) {
-          return -1;
-        } else {
-          return 0;
-        }
       } else {
         return 0;
       }
     });
+
   const creditEntries = entries
     .filter((e) => e.amount >= 0)
-    .reverse()
+    .sort((a, b) => {
+      if (a.updatedAt && b.updatedAt) {
+        return dayjs(b.updatedAt).diff(dayjs(a.updatedAt));
+      } else if (a.updatedAt) {
+        return -1;
+      } else if (b.updatedAt) {
+        return 1;
+      } else {
+        return 0;
+      }
+    })
     .sort((a, b) => {
       // modify the sort so that entries matching entriesAtEnd come last
       // but since commission is at the very end, it should come last among them

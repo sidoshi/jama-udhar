@@ -73,6 +73,7 @@ function AddEntryForm() {
         amount: numericValue,
         previousAmmount: 0,
         checked: false,
+        updatedAt: dayjs().toISOString(),
       });
 
       setAccount(null);

@@ -32,6 +32,7 @@ export type Entry = {
   previousAmmount: number;
   amount: number;
   checked: boolean;
+  updatedAt: string;
 };
 
 export type ActivityLog =
@@ -195,6 +196,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
           entryToUpdate.amount = entry.amount;
           entryToUpdate.account = entry.account;
           entryToUpdate.checked = entry.checked;
+          entryToUpdate.updatedAt = dayjs().toISOString();
 
           cashBook.activityLog = cashBook.activityLog || [];
           if (oldAmount !== entry.amount) {
