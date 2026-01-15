@@ -10,6 +10,8 @@ import dayjs from "dayjs";
 import { handlePDFRestore } from "./pdfRestore";
 import { useSetAtom } from "jotai";
 import { printPdfAtom } from "./store/slices/cashBookSlice";
+import { PWAInstaller } from "./components/PWAInstaller";
+import { OfflineIndicator } from "./components/OfflineIndicator";
 
 const darkTheme = createTheme({
   palette: {
@@ -76,6 +78,8 @@ export default function App() {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <CssBaseline />
         <Layout />
+        <PWAInstaller />
+        <OfflineIndicator />
       </LocalizationProvider>
     </ThemeProvider>
   );
