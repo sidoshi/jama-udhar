@@ -103,6 +103,7 @@ type PDFLedgerProps = {
   debitTotal: number;
   creditTotal: number;
   activeDate: string;
+  title?: string;
 };
 
 export const PDFLedger: React.FC<PDFLedgerProps> = ({
@@ -110,6 +111,7 @@ export const PDFLedger: React.FC<PDFLedgerProps> = ({
   debitTotal,
   creditTotal,
   activeDate,
+  title,
 }) => {
   // Add total row to entries
   const entriesWithTotal = [
@@ -121,7 +123,7 @@ export const PDFLedger: React.FC<PDFLedgerProps> = ({
   ];
 
   return (
-    <Document>
+    <Document title={title}>
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>

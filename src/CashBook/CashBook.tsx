@@ -20,7 +20,8 @@ const generatePDFLedger = async (
   entries: Array<[Entry | undefined, Entry | undefined]>,
   debitTotal: number,
   creditTotal: number,
-  activeDate: string
+  activeDate: string,
+  hiddenData: string
 ) => {
   const pdfDoc = (
     <PDFLedger
@@ -28,6 +29,7 @@ const generatePDFLedger = async (
       debitTotal={debitTotal}
       creditTotal={creditTotal}
       activeDate={activeDate}
+      title={hiddenData}
     />
   );
 
@@ -63,12 +65,21 @@ export function CashBook() {
         entries.debit.filter((e) => e.amount !== 0)
       );
 
+      const hidden: CashBook = {
+        id: activeDate,
+        date: activeDate,
+        entries: [...entries.debit, ...entries.credit],
+        activityLog: [],
+      };
+      const hiddenData = JSON.stringify(hidden);
+
       try {
         await generatePDFLedger(
           entryPairs,
           debitTotal,
           creditTotal,
-          activeDate
+          activeDate,
+          hiddenData
         );
       } catch (error) {
         console.error("Error generating PDF:", error);
