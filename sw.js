@@ -198,6 +198,9 @@ define(['./workbox-2ae722a1'], (function (workbox) { 'use strict';
     "url": "assets/index-Cbl02gOy.css",
     "revision": null
   }, {
+    "url": "assets/index-Bcxk3Y6k.js",
+    "revision": null
+  }, {
     "url": "favicon.ico",
     "revision": "04dd8a3de694d0223c63d794b32d86ed"
   }, {
