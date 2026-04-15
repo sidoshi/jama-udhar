@@ -47,6 +47,11 @@ export function ActivityLogEntry({ log }: { log: ActivityLog }) {
             <Typography variant="body2" color="text.primary" sx={{ ml: 2 }}>
               <strong>{log.account}</strong> • {toLocaleRupeeString(log.amount)}
             </Typography>
+            {log.notes && (
+              <Typography variant="body2" color="text.secondary" sx={{ ml: 2, mt: 0.5, fontStyle: "italic" }}>
+                "{log.notes}"
+              </Typography>
+            )}
           </Box>
         )}
 
@@ -93,6 +98,11 @@ export function ActivityLogEntry({ log }: { log: ActivityLog }) {
             >
               <strong>{log.account}</strong>
             </Typography>
+            {log.notes && (
+              <Typography variant="body2" color="text.secondary" sx={{ ml: 2, mb: 0.5, fontStyle: "italic" }}>
+                "{log.notes}"
+              </Typography>
+            )}
             <Box
               sx={{ ml: 2 }}
               display="flex"

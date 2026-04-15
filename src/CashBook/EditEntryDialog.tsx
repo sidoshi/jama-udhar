@@ -30,11 +30,13 @@ export function EditEntryDialog({
   const [account, setAccount] = useState(entry.account);
   const [amount, setAmount] = useState(entry.amount.toString());
   const [checked, setChecked] = useState(entry.checked);
+  const [notes, setNotes] = useState(entry.notes ?? "");
 
   const handleDialogEnter = () => {
     setAccount(entry.account);
     setAmount(entry.amount.toString());
     setChecked(entry.checked);
+    setNotes(entry.notes ?? "");
   };
 
   const handleSave = () => {
@@ -56,6 +58,7 @@ export function EditEntryDialog({
       account: account.trim(),
       amount: numericAmount,
       checked,
+      notes: notes.trim() || undefined,
     });
 
     onClose();
@@ -92,6 +95,16 @@ export function EditEntryDialog({
             fullWidth
             required
             helperText="You can enter mathematical expressions like 100+50"
+          />
+
+          <TextField
+            label="Notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            fullWidth
+            multiline
+            minRows={2}
+            placeholder="Optional note for this entry"
           />
 
           <FormControlLabel

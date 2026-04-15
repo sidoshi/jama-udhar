@@ -3,6 +3,7 @@ import {
   DriveFileRenameOutline,
   MoreVert,
   SwitchAccount,
+  StickyNote2,
 } from "@mui/icons-material";
 import {
   Grid,
@@ -14,6 +15,7 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Popover,
 } from "@mui/material";
 import { useState } from "react";
 import { useAppStore } from "../store";
@@ -45,6 +47,8 @@ export function Row({ entry }: RowProps) {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
+
+  const [notesAnchorEl, setNotesAnchorEl] = useState<null | HTMLElement>(null);
 
   function handleMenuOpen(event: React.MouseEvent<HTMLElement>) {
     setAnchorEl(event.currentTarget);
@@ -91,16 +95,27 @@ export function Row({ entry }: RowProps) {
     <>
       <Grid container px={1} size={12} key={id}>
         <Grid size={6} py={1} alignContent="center">
-          <Typography
-            variant="body1"
-            sx={{
-              textDecoration: entry.checked ? "underline" : "none",
-              textDecorationThickness: "2px",
-              textDecorationStyle: "wavy",
-            }}
-          >
-            {account}
-          </Typography>
+          <Box display="flex" alignItems="center" gap={0.5}>
+            <Typography
+              variant="body1"
+              sx={{
+                textDecoration: entry.checked ? "underline" : "none",
+                textDecorationThickness: "2px",
+                textDecorationStyle: "wavy",
+              }}
+            >
+              {account}
+            </Typography>
+            {entry.notes && (
+              <IconButton
+                size="small"
+                onClick={(e) => setNotesAnchorEl(e.currentTarget)}
+                sx={{ p: 0.25 }}
+              >
+                <StickyNote2 fontSize="small" color="action" />
+              </IconButton>
+            )}
+          </Box>
           {entry.previousAmmount != null &&
             entry.previousAmmount !== entry.amount &&
             entry.previousAmmount !== 0 && (
@@ -148,6 +163,21 @@ export function Row({ entry }: RowProps) {
         entry={entry}
         onClose={() => setEditDialogOpen(false)}
       />
+
+      <Popover
+        open={Boolean(notesAnchorEl)}
+        anchorEl={notesAnchorEl}
+        onClose={() => setNotesAnchorEl(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Typography
+          sx={{ p: 1.5, maxWidth: 260, whiteSpace: "pre-wrap" }}
+          variant="body2"
+        >
+          {entry.notes}
+        </Typography>
+      </Popover>
     </>
   );
 }

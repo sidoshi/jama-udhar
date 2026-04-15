@@ -35,6 +35,7 @@ function AddEntryForm() {
   const addEntry = useAppStore((state) => state.addEntry);
   const [account, setAccount] = useAtom(addAccountAtom);
   const [amount, setAmount] = useState<string>("");
+  const [notes, setNotes] = useState<string>("");
   const accountRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -74,10 +75,12 @@ function AddEntryForm() {
         previousAmmount: 0,
         checked: false,
         updatedAt: dayjs().toISOString(),
+        notes: notes.trim() || undefined,
       });
 
       setAccount(null);
       setAmount("");
+      setNotes("");
       requestAnimationFrame(() => {
         setTimeout(() => {
           accountRef.current?.focus();
@@ -113,6 +116,18 @@ function AddEntryForm() {
                   : amount
               }
               onChange={onAmountChange}
+            />
+          </Grid>
+          <Grid size={10}>
+            <TextField
+              fullWidth
+              label="Notes (optional)"
+              variant="outlined"
+              size="small"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              multiline
+              minRows={2}
             />
           </Grid>
         </Grid>

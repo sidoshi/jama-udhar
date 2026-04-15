@@ -20,7 +20,7 @@ export const setEditBoxIdAtom = atom(
       const editBoxId = `${activeDate}-${update}`;
       set(editBoxIdAtom, editBoxId);
     }
-  }
+  },
 );
 
 export const addAccountAtom = atom<string | null>(null);
@@ -33,6 +33,7 @@ export type Entry = {
   amount: number;
   checked: boolean;
   updatedAt: string;
+  notes?: string;
 };
 
 export type ActivityLog =
@@ -42,6 +43,7 @@ export type ActivityLog =
       kind: "add";
       account: string;
       amount: number;
+      notes?: string;
     }
   | {
       id: string;
@@ -57,6 +59,7 @@ export type ActivityLog =
       account: string;
       oldAmount: number;
       newAmount: number;
+      notes?: string;
     }
   | {
       id: string;
@@ -114,7 +117,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
     set((state) => {
       if (state.cashBookByDate[state.activeDate] == null) {
         const copiedCashBook = getCopiedFromMostRecentCashBook(
-          state.activeDate
+          state.activeDate,
         );
         if (copiedCashBook) {
           state.cashBookByDate[state.activeDate] = copiedCashBook;
@@ -142,7 +145,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
     set((state) => {
       if (state.cashBookByDate[state.activeDate] == null) {
         const copiedCashBook = getCopiedFromMostRecentCashBook(
-          state.activeDate
+          state.activeDate,
         );
         if (copiedCashBook) {
           state.cashBookByDate[state.activeDate] = copiedCashBook;
@@ -173,6 +176,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
           kind: "add" as const,
           account: entry.account,
           amount: entry.amount,
+          notes: entry.notes,
         });
       }
     }),
@@ -181,7 +185,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
     set((state) => {
       if (state.cashBookByDate[state.activeDate] == null) {
         const copiedCashBook = getCopiedFromMostRecentCashBook(
-          state.activeDate
+          state.activeDate,
         );
         if (copiedCashBook) {
           state.cashBookByDate[state.activeDate] = copiedCashBook;
@@ -197,6 +201,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
           entryToUpdate.account = entry.account;
           entryToUpdate.checked = entry.checked;
           entryToUpdate.updatedAt = dayjs().toISOString();
+          entryToUpdate.notes = entry.notes;
 
           cashBook.activityLog = cashBook.activityLog || [];
           if (oldAmount !== entry.amount) {
@@ -207,6 +212,7 @@ export const createCashBookSlice: SliceStateCreator<CashBookSlice> = (set) => ({
               account: entry.account,
               oldAmount,
               newAmount: entry.amount,
+              notes: entry.notes,
             });
           }
         }
